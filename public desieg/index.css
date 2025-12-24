@@ -217,36 +217,3 @@ h2 { margin-top: 0; color: #5f4b8b; }
     line-height: 1.7;
     font-size: 1.1rem;
 }
-
-/* แต่งปุ่มปิดเสียง */
-  /* Position the mute button in the top right corner */
-  .audio-container {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    z-index: 100; /* Keeps it above the background */
-  }
-
-  /* Monster Hunter style button */
-  .game-button {
-    background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%);
-    color: #e3c16f; /* Gold color */
-    border: 2px solid #e3c16f;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    /* Creates the angled "RPG" button shape */
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-  }
-
-  .game-button:hover {
-    background: #e3c16f;
-    color: #2b2b2b;
-    box-shadow: 0 0 20px rgba(227, 193, 111, 0.8);
-    transform: scale(1.05);
-  }

@@ -51,26 +51,3 @@ function closeModal() {
 modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
 });
-
-//ปิดเสียง
-// This waits for the first click on the page to start the music
-function toggleMute() {
-    var audio = document.getElementById("myAudio");
-    var btn = document.getElementById("muteBtn");
-
-    // Check if the audio element actually exists
-    if (!audio) {
-        console.error("Audio element not found!");
-        return;
-    }
-
-    if (audio.muted) {
-        audio.muted = false;
-        btn.innerHTML = "🔇 Mute Music";
-        console.log("Music Unmuted");
-    } else {
-        audio.muted = true;
-        btn.innerHTML = "🔊 Unmute Music";
-        console.log("Music Muted");
-    }
-}
