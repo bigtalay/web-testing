@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MH Monster Guide - Commented Version</title>
+    <style>
+        /* =========================================
+           ส่วนที่ 1: CSS ตกแต่งหลัก
+           ========================================= */
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+        }
+
+        .main-container {
+            width: 100%; height: 100vh;
+            transition: transform 1.0s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .section {
+            width: 100%; height: 100vh;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            position: relative;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .sec2::before, .sec3::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1;
+        }
+
+        /* รูปพื้นหลังแต่ละฉาก */
+        .sec1 { background-image: url('https://image.api.playstation.com/vulcan/img/rnd/202010/0106/IyY3JSzHNCVoh7FultMPaE8F.jpg'); }
+        .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
+        .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
+
+        /* การ์ดมอนสเตอร์ */
+        .monster-grid {
+            z-index: 2; display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;
+            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-in-out 0.3s;
+        }
+        .section.active .monster-grid { opacity: 1; transform: translateY(0); }
+
+        .monster-card {
+            width: 200px; height: 280px;
+            background-color: #333; background-size: cover; background-position: center;
+            border-radius: 15px; cursor: pointer; position: relative; overflow: hidden;
+            border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .monster-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,255,150,0.3); border-color: #00ff96;
+        }
+        .monster-name-tag {
+            position: absolute; bottom: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white; text-align: center; padding: 15px 0;
+            font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px black;
+        }
+
+        /* --- หน้าสมุด Pop-up --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .book-container {
+            width: 90%; max-width: 1000px; height: 80vh;
+            background: url('https://i.ibb.co/Dkb07Hj/image-2.jpg') no-repeat center center;
+            background-size: cover;
+            border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+            transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.show .book-container { transform: scale(1); }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 30px;
+            color: white; font-size: 2rem; cursor: pointer; z-index: 102;
+            background: rgba(0,0,0,0.5); width: 40px; height: 40px;
+            border-radius: 50%; text-align: center; line-height: 40px;
+        }
+
+        .book-content-scroll {
+            width: 100%; height: 100%; overflow-y: auto;
+            padding: 40px; box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9); color: #333;
+        }
+
+        /* Layout เนื้อหา */
+        .monster-detail-layout { display: flex; gap: 30px; flex-wrap: wrap; }
+        .monster-image-large { flex: 1; min-width: 300px; }
+        .monster-image-large img { width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .monster-info { flex: 2; min-width: 300px; }
+        .info-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
+        h2 { margin-top: 0; color: #5f4b8b; }
+
+        /* สำหรับรูปจุดอ่อน ให้ยืดหดตามกรอบ ไม่ล้น */
+        .weakness-img {
+            width: 100%;      /* กว้างเต็มกรอบ */
+            height: auto;     /* สูงตามสัดส่วน */
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* เงาเล็กน้อย */
+            border: 2px solid #5f4b8b; /* ขอบสีม่วงให้เข้า theme */
+        }
+
+        /* ปุ่ม Scroll & Dots */
+        .scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; animation: bounce 2s infinite; cursor: pointer; }
+        .arrow { width: 20px; height: 20px; border-bottom: 4px solid white; border-right: 4px solid white; transform: rotate(45deg); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-20px);} }
+        .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 10; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .dot.active { background: white; transform: scale(1.5); }
+    </style>
+</head>
+<body>
+
+    <div class="main-container" id="mainContainer">
+        <div class="section sec1 active">
+            <div class="scroll-down" onclick="scrollToSection(1)"><div class="arrow"></div></div>
+        </div>
+
+        <div class="section sec2">
+            <h1 style="color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px;">Monster List</h1>
+            <div class="monster-grid">
+                
+                <div class="monster-card" onclick="openModal('great-jagras')" 
+                     style="background-image: url('https://i.ytimg.com/vi/8-G2yrtL6lk/maxresdefault.jpg');">
+                    <div class="monster-name-tag">Great Jagras</div>
+                </div>
+
+                <div class="monster-card" onclick="openModal('pukei-pukei')"
+                     style="background-image: url('https://via.placeholder.com/200x280?text=Pukei');">
+                    <div class="monster-name-tag">Pukei-Pukei</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section sec3">
+            <h1 style="color: white; z-index: 2;">More to come...</h1>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="monsterModal">
+        <div class="book-container">
+            <div class="close-btn" onclick="closeModal()">&times;</div>
+            
+            <div class="book-content-scroll">
+                
+                <div id="content-great-jagras" class="monster-detail-layout">
+                    
+                    <div class="monster-image-large">
+                        <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1211172/ss_14c3887a115cf2077a0f19b21d1c15137cbb9d5a.1920x1080.jpg?t=1702451101" alt="Great Jagras">
+                    </div>
+
+                    <div class="monster-info">
+                        <h2>Great Jagras</h2>
+                        <div class="info-section">
+                            <h3>ข้อมูลทั่วไป</h3>
+                            <p>มอนสเตอร์ประเภท Fanged Wyvern ที่ตะกละตะกลาม...</p>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3>จุดอ่อน (Weaknesses)</h3>
+                            <p>แพ้ไฟ (Fire) ⭐⭐⭐</p>
+                            
+                            <p><strong>ตารางจุดอ่อนและชิ้นส่วน:</strong></p>
+                            <img src="https://oyster.ignimgs.com/mediawiki/apis.ign.com/monster-hunter-world/4/4e/Screen_Shot_2018-01-26_at_12.55.15_PM.jpg?width=1280" 
+                                 class="weakness-img" 
+                                 alt="Great Jagras Weakness Chart">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-pukei-pukei" class="monster-detail-layout" style="display: none;">
+                    <div class="monster-image-large">
+                        <img src="https://via.placeholder.com/400x300?text=Pukei+Image" alt="Pukei">
+                    </div>
+                    <div class="monster-info">
+                        <h2>Pukei-Pukei</h2>
+                        <div class="info-section">
+                            <h3>ข้อมูลทั่วไป</h3>
+                            <p>มอนสเตอร์นกที่มีพิษร้ายแรง...</p>
+                        </div>
+                        <div class="info-section">
+                            <h3>จุดอ่อน</h3>
+                            <p>แพ้สายฟ้า (Thunder) ⭐⭐⭐</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+        </div>
+    </div>
+
+    <div class="nav-dots">
+        <div class="dot active" onclick="scrollToSection(0)"></div>
+        <div class="dot" onclick="scrollToSection(1)"></div>
+        <div class="dot" onclick="scrollToSection(2)"></div>
+    </div>
+
+    <script>
+        let currentSection = 0;
+        const totalSections = 3;
+        let isScrolling = false;
+        const container = document.getElementById('mainContainer');
+        const dots = document.querySelectorAll('.dot');
+        const sections = document.querySelectorAll('.section');
+        const modal = document.getElementById('monsterModal');
+
+        function scrollToSection(index) {
+            if (index < 0 || index >= totalSections) return;
+            currentSection = index;
+            container.style.transform = `translateY(-${currentSection * 100}vh)`;
+            sections.forEach(sec => sec.classList.remove('active'));
+            sections[currentSection].classList.add('active');
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[currentSection].classList.add('active');
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 1000);
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (modal.classList.contains('show')) return;
+            if (isScrolling) return;
+            if (e.deltaY > 0) scrollToSection(currentSection + 1);
+            else scrollToSection(currentSection - 1);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('show')) return;
+            if (isScrolling) return;
+            if (e.key === 'ArrowDown') scrollToSection(currentSection + 1);
+            if (e.key === 'ArrowUp') scrollToSection(currentSection - 1);
+        });
+
+        function openModal(monsterId) {
+            modal.classList.add('show');
+            const allContents = document.querySelectorAll('.monster-detail-layout');
+            allContents.forEach(content => { content.style.display = 'none'; });
+            const targetContent = document.getElementById('content-' + monsterId);
+            if (targetContent) targetContent.style.display = 'flex';
+        }
+
+        function closeModal() { modal.classList.remove('show'); }
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    </script>
+
+</body>
+</html>
