@@ -27,10 +27,47 @@ body, html {
 }
 
 /* รูปพื้นหลัง */
-.sec1 { background-image: url('https://media1.tenor.com/m/94K68dh0muoAAAAC/momter-hunter.gif'); }
-.sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
+    .sec1 { 
+    background-image: url('https://media1.tenor.com/m/94K68dh0muoAAAAC/momter-hunter.gif'); 
+    }
+    .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
+    .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
+
+
+    .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
 .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
 
+
+/* The YouTube Wrapper */
+.youtube-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.youtube-bg iframe {
+    width: 100vw;
+    height: 56.25vw; 
+    min-height: 100vh;
+    min-width: 177.77vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+/* Bring text/buttons to the front */
+.sec1 .scroll-down, 
+.sec1 h1,
+.sec1 .monster-grid {
+    position: relative;
+    z-index: 2;
+}
 /* หัวข้อหน้า Monster List */
 .monster-list-title {
     color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px;
@@ -45,8 +82,8 @@ body, html {
 
 .monster-card {
     width: 200px; height: 280px;
-    background-color: #333; background-size: cover; background-position: center;
-    border-radius: 15px; cursor: pointer; position: relative; overflow: hidden;
+    background-color: #333; background-size: contain; background-position: center;
+    border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
 }
 .monster-card:hover {
@@ -98,7 +135,7 @@ body, html {
 /* Layout เนื้อหา */
 .monster-detail-layout { display: flex; gap: 30px; flex-wrap: wrap; }
 .monster-image-large { flex: 1; min-width: 300px; }
-.monster-image-large img { width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.monster-image-large img { width: 100%; height: 350px; object-fit: cover; object-position: top center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .monster-info { flex: 2; min-width: 300px; }
 .info-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
 h2 { margin-top: 0; color: #5f4b8b; }
@@ -174,3 +211,4 @@ h2 { margin-top: 0; color: #5f4b8b; }
 #youtube-player {
     position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: -100;
 }
+

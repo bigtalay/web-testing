@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MH Monster Guide</title>
+
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="main-container" id="mainContainer">
+      <div class="audio-container">
+        <div id="youtube-player"></div>
+
+        <button onclick="toggleMute()" id="muteBtn" class="game-button">
+          🔊 Mute Music
+        </button>
+      </div>
+
+      <div class="section sec1 active">
+        <div class="scroll-down" onclick="scrollToSection(1)">
+          <div class="arrow"></div>
+        </div>
+      </div>
+
+      <div class="section sec2">
+        <h1 class="monster-list-title">Monster List</h1>
+        <div class="monster-grid" id="monsterGrid"></div>
+      </div>
+
+      <div class="section sec3">
+        <h1 style="color: white; z-index: 2">More to come...</h1>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="monsterModal">
+      <div class="book-container">
+        <div class="close-btn" onclick="closeModal()">&times;</div>
+
+        <div class="book-content-scroll" id="bookContent"></div>
+      </div>
+    </div>
+
+    <div class="nav-dots">
+      <div class="dot active" onclick="scrollToSection(0)"></div>
+      <div class="dot" onclick="scrollToSection(1)"></div>
+      <div class="dot" onclick="scrollToSection(2)"></div>
+    </div>
+
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
