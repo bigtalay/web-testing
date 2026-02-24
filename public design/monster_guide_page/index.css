@@ -51,7 +51,7 @@ body, html {
 
 .monster-card, .add-monster-card {
     width: 200px; aspect-ratio: 2/3; height: 280; 
-    background-color: #333; background-size:cover; background-position: center;
+    background-color: #333; background-size:contain; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
 }
