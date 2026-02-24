@@ -323,7 +323,7 @@ function onPlayerReady(event) { event.target.mute(); event.target.playVideo(); }
 document.addEventListener('click', function(e) {
     if (e.target.id === 'muteBtn' || e.target.closest('#muteBtn')) return;
     if (player && typeof player.unMute === 'function' && player.isMuted()) {
-        player.unMute(); player.setVolume(50); isMuted = false;
+        player.unMute(); player.setVolume(15); isMuted = false;
         const btn = document.getElementById("muteBtn"); if(btn) btn.innerHTML = "🔊 Mute Music";
     }
 }, { once: true });
