@@ -20,132 +20,85 @@ body, html {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 
-/* พื้นหลังมืดจางๆ */
 .sec2::before, .sec3::before {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); z-index: 1;
 }
 
 /* รูปพื้นหลัง */
-    .sec1 { 
-    background-image: url('https://media1.tenor.com/m/94K68dh0muoAAAAC/momter-hunter.gif'); 
-    }
-    .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
-    .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
-
-
-    .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
+.sec1 { background-image: url('https://media1.tenor.com/m/94K68dh0muoAAAAC/momter-hunter.gif'); }
+.sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
 .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
 
-
-/* The YouTube Wrapper */
-.youtube-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-}
-
+/* Youtube Background */
+.youtube-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
 .youtube-bg iframe {
-    width: 100vw;
-    height: 56.25vw; 
-    min-height: 100vh;
-    min-width: 177.77vh;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.3);
+    width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3);
 }
 
-/* Bring text/buttons to the front */
-.sec1 .scroll-down, 
-.sec1 h1,
-.sec1 .monster-grid {
-    position: relative;
-    z-index: 2;
-}
-/* หัวข้อหน้า Monster List */
-.monster-list-title {
-    color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px;
-}
+.sec1 .scroll-down, .sec1 h1, .sec1 .monster-grid { position: relative; z-index: 2; }
+.monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px; }
 
-/* การ์ดมอนสเตอร์ */
+/* Grid การ์ดมอนสเตอร์ */
 .monster-grid {
-    z-index: 2; display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;
+    z-index: 2; display: grid; 
+    grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, auto);   
+    gap: 15px; width: 90%; max-width: 1400px; 
     opacity: 0; transform: translateY(50px); transition: all 0.8s ease-in-out 0.3s;
 }
 .section.active .monster-grid { opacity: 1; transform: translateY(0); }
 
-.monster-card {
-    width: 200px; height: 280px;
+.monster-card, .add-monster-card {
+    width: 100%; aspect-ratio: 2/3; height: auto; min-height: 200px; 
     background-color: #333; background-size: contain; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
 }
-.monster-card:hover {
-    transform: scale(1.05) translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0,255,150,0.3); border-color: #00ff96;
-}
+.monster-card:hover { transform: scale(1.05) translateY(-10px); box-shadow: 0 10px 20px rgba(0,255,150,0.3); border-color: #00ff96; }
 .monster-name-tag {
     position: absolute; bottom: 0; width: 100%;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-    color: white; text-align: center; padding: 15px 0;
-    font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px black;
+    color: white; text-align: center; padding: 15px 0; font-weight: bold; font-size: 1.2rem; text-shadow: 0 2px 4px black;
 }
 
-/* สมุด Pop-up */
+/* Modals */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); z-index: 100;
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    background: rgba(0, 0, 0, 0.85); z-index: 100; display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
 }
 .modal-overlay.show { opacity: 1; pointer-events: auto; }
 
 .book-container {
-    width: 90%; max-width: 1000px; height: 80vh;
-    background: url('https://i.ibb.co/Dkb07Hj/image-2.jpg') no-repeat center center;
-    background-size: cover;
-    border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    position: relative; overflow: hidden;
-    transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 90%; max-width: 1000px; height: 85vh;
+    background: linear-gradient(rgba(255, 252, 245, 0.7), rgba(255, 252, 245, 0.7)), url('https://legendofferox.com/wp-content/uploads/2022/01/LegendofFerox-Background.jpg');
+    background-size: cover; background-position: center;
+    border-radius: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden; transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-.modal-overlay.show .book-container { transform: scale(1); }
+.modal-overlay.show .book-container { transform: scale(1) translateY(0); }
 
 .close-btn {
-    position: absolute; top: 20px; right: 30px;
-    color: #333; font-size: 2rem; cursor: pointer; z-index: 102;
-    background: rgba(255,255,255,0.8); width: 40px; height: 40px;
-    border-radius: 50%; text-align: center; line-height: 40px;
+    position: absolute; top: 20px; right: 25px; color: #5d4037; font-size: 2rem; cursor: pointer; z-index: 102;
+    background: rgba(255, 255, 255, 0.5); width: 45px; height: 45px; border-radius: 50%; text-align: center; line-height: 42px; transition: background 0.3s;
 }
+.close-btn:hover { background: rgba(255, 255, 255, 0.9); }
 
-.book-content-scroll {
-    width: 100%; height: 100%; overflow-y: auto;
-    padding: 40px; box-sizing: border-box;
-    background: rgba(255, 255, 255, 0.9); color: #333;
-}
-
+.book-content-scroll { width: 100%; height: 100%; overflow-y: auto; padding: 50px; box-sizing: border-box; background: transparent; color: #3e2723; }
 .book-content-scroll::-webkit-scrollbar { width: 8px; }
 .book-content-scroll::-webkit-scrollbar-thumb { background: #a1887f; border-radius: 10px; }
 
-/* Layout เนื้อหา */
+/* รายละเอียดมอนสเตอร์ */
 .monster-detail-layout { display: flex; gap: 30px; flex-wrap: wrap; }
-.monster-image-large { flex: 1; min-width: 300px; }
+.monster-image-large { flex: 1; min-width: 300px; position: relative; }
 .monster-image-large img { width: 100%; height: 350px; object-fit: cover; object-position: top center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .monster-info { flex: 2; min-width: 300px; }
 .info-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
 h2 { margin-top: 0; color: #5f4b8b; }
+.weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
-.weakness-img {
-    width: 100%; height: auto; border-radius: 8px; margin-top: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b;
-}
-
-/* ปุ่มเลื่อน */
+/* Scroll Down & Dots */
 .scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; animation: bounce 2s infinite; cursor: pointer; }
 .arrow { width: 20px; height: 20px; border-bottom: 4px solid white; border-right: 4px solid white; transform: rotate(45deg); }
 @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-20px);} }
@@ -153,62 +106,54 @@ h2 { margin-top: 0; color: #5f4b8b; }
 .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
 .dot.active { background: white; transform: scale(1.5); }
 
-/* --- CSS ส่วนสมุด Pop-up ที่ปรับปรุงใหม่ --- */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85); z-index: 100;
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-}
-.modal-overlay.show { opacity: 1; pointer-events: auto; }
-
-.book-container {
-    width: 90%; max-width: 1000px; height: 85vh;
-    background: linear-gradient(rgba(255, 252, 245, 0.7), rgba(255, 252, 245, 0.7)), 
-                url('https://legendofferox.com/wp-content/uploads/2022/01/LegendofFerox-Background.jpg');
-    background-size: cover; background-position: center;
-    border-radius: 15px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-    position: relative; overflow: hidden;
-    transform: scale(0.9) translateY(20px); 
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-.modal-overlay.show .book-container { transform: scale(1) translateY(0); }
-
-.close-btn {
-    position: absolute; top: 20px; right: 25px;
-    color: #5d4037; font-size: 2rem; cursor: pointer; z-index: 102;
-    background: rgba(255, 255, 255, 0.5); width: 45px; height: 45px;
-    border-radius: 50%; text-align: center; line-height: 42px;
-    transition: background 0.3s;
-}
-.close-btn:hover { background: rgba(255, 255, 255, 0.9); }
-
-.book-content-scroll {
-    width: 100%; height: 100%; overflow-y: auto;
-    padding: 50px; box-sizing: border-box;
-    background: transparent; color: #3e2723;
-}
-
-/* 🟢 [CSS ปุ่มเสียง] */
-.audio-container {
-    position: absolute; top: 25px; right: 25px; z-index: 1000;
-}
+/* ปุ่มเสียง */
+.audio-container { position: absolute; top: 25px; right: 25px; z-index: 1000; }
 .game-button {
-    background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%);
-    color: #e3c16f;
-    border: 2px solid #e3c16f;
-    padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase;
-    cursor: pointer; transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
+    padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
 }
-.game-button:hover {
-    background: #e3c16f; color: #2b2b2b;
-    box-shadow: 0 0 20px rgba(227, 193, 111, 0.8);
-}
+.game-button:hover { background: #e3c16f; color: #2b2b2b; box-shadow: 0 0 20px rgba(227, 193, 111, 0.8); }
+#youtube-player { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: -100; }
 
-/* 🟢 [ซ่อน YouTube Player (ให้เหลือแต่เสียง)] */
-#youtube-player {
-    position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: -100;
-}
+/* ปุ่มเพิ่มมอนสเตอร์ */
+.add-monster-card { background-color: #444; display: flex; justify-content: center; align-items: center; border: 3px dashed #777; transition: all 0.3s; }
+.add-monster-card:hover { transform: scale(1.05) translateY(-10px); background-color: #555; border-color: #e3c16f; box-shadow: 0 10px 20px rgba(227, 193, 111, 0.3); }
+.add-icon { font-size: 3rem; color: #888; transition: color 0.3s; }
+.add-monster-card:hover .add-icon { color: #e3c16f; }
 
+/* ฟอร์ม */
+.add-form-container { max-width: 600px; }
+.monster-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.input-group { display: flex; flex-direction: column; gap: 5px; }
+.input-group label { font-weight: bold; color: #3e2723; font-size: 1.1rem; }
+.input-group input, .input-group textarea { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
+.input-group input:focus, .input-group textarea:focus { outline: none; border-color: #5f4b8b; }
+.submit-btn { margin-top: 20px; padding: 15px; font-size: 1.2rem; text-align: center; width: 100%; }
+
+/* --- 🗑️ & ✏️ กลุ่มปุ่มลบและแก้ไขมอนสเตอร์ --- */
+.delete-section {
+    position: absolute; bottom: -50px; left: 0px; z-index: 105;
+    display: flex; gap: 15px; align-items: center;
+}
+.delete-btn { background: none; border: none; cursor: pointer; color: #3e2723; padding: 5px; transition: transform 0.2s, color 0.2s; }
+.delete-btn:hover { transform: scale(1.1); color: #d32f2f; }
+.edit-btn { background: none; border: none; cursor: pointer; color: #3e2723; padding: 5px; transition: transform 0.2s, color 0.2s; }
+.edit-btn:hover { transform: scale(1.1); color: #1565c0; }
+
+/* กล่องยืนยันการลบ */
+.delete-confirm {
+    position: absolute; bottom: 55px; left: 0px;
+    background-image: url('cknepx23usg41.jpg'); background-size: cover; background-position: center;
+    border: 2px solid #000; display: none; width: 220px; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+.delete-confirm.show-confirm { display: flex; flex-direction: column; }
+.confirm-text { padding: 15px 10px; text-align: center; font-size: 1.2rem; font-weight: bold; color: #000; border-bottom: 2px solid #000; background: rgba(255, 255, 255, 0.4); }
+.confirm-actions { display: flex; height: 45px; }
+.confirm-actions button {
+    flex: 1; padding: 0; border: none; background: transparent; cursor: pointer;
+    font-size: 1.2rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #000; transition: background 0.2s;
+}
+.btn-yes { border-right: 2px solid #000 !important; }
+.btn-yes:hover { background: rgba(255, 0, 0, 0.2); }
+.btn-no:hover { background: rgba(0, 0, 0, 0.1); }
