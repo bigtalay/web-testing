@@ -50,8 +50,8 @@ body, html {
 .section.active .monster-grid { opacity: 1; transform: translateY(0); }
 
 .monster-card, .add-monster-card {
-    width: 100%; aspect-ratio: 2/3; height: auto; min-height: 200px; 
-    background-color: #333; background-size: contain; background-position: center;
+    width: 200px; aspect-ratio: 2/3; height: 280; 
+    background-color: #333; background-size:cover; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
 }
