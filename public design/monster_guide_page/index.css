@@ -50,7 +50,7 @@ body, html {
 .section.active .monster-grid { opacity: 1; transform: translateY(0); }
 
 .monster-card, .add-monster-card {
-    width: 200px; aspect-ratio: 2/3; height: 280; 
+    width: 100%; aspect-ratio: 2/3; height: 280; 
     background-color: #333; background-size:contain; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
@@ -187,6 +187,13 @@ h2 { margin-top: 0; color: #5f4b8b; }
         margin-top: 10px;
     }
     
+@media screen and (max-width: 1366px) {
+    .monster-grid {
+        grid-template-columns: repeat(5, 1fr); /* ลดเหลือ 5 คอลัมน์ */
+        gap: 12px;
+    }
+}
+
     .book-container {
         width: 95%; /* ขยายสมุดให้เต็มจอมากขึ้น */
         height: 90vh;
