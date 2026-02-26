@@ -157,3 +157,67 @@ h2 { margin-top: 0; color: #5f4b8b; }
 .btn-yes { border-right: 2px solid #000 !important; }
 .btn-yes:hover { background: rgba(255, 0, 0, 0.2); }
 .btn-no:hover { background: rgba(0, 0, 0, 0.1); }
+
+
+
+/* =========================================
+   📱 โค้ดสำหรับหน้าจอ Mobile & Tablet (Responsive)
+   ========================================= */
+
+/* สำหรับหน้าจอขนาดกลาง (iPad/Tablet) ที่กว้างไม่เกิน 1024px */
+@media screen and (max-width: 1024px) {
+    .monster-grid {
+        grid-template-columns: repeat(4, 1fr); /* ลดเหลือ 4 คอลัมน์ */
+        gap: 10px;
+    }
+    .monster-card, .add-monster-card {
+        width: 100%; /* ให้การ์ดยืดหดตามขนาดคอลัมน์ */
+        height: auto;
+    }
+    .youtube-bg iframe {
+        transform: translate(-50%, -50%) scale(1.8); /* ขยายวิดีโอพื้นหลังไม่ให้มีขอบดำ */
+    }
+}
+
+/* สำหรับหน้าจอขนาดเล็ก (Mobile/โทรศัพท์มือถือ) ที่กว้างไม่เกิน 768px */
+@media screen and (max-width: 768px) {
+    .monster-grid {
+        grid-template-columns: repeat(2, 1fr); /* ลดเหลือ 2 คอลัมน์ */
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .book-container {
+        width: 95%; /* ขยายสมุดให้เต็มจอมากขึ้น */
+        height: 90vh;
+    }
+    
+    .book-content-scroll {
+        padding: 20px; /* ลดระยะขอบด้านใน เพื่อให้เนื้อหามีพื้นที่มากขึ้น */
+    }
+
+    /* จัดหน้าต่างรายละเอียดให้รูปภาพและเนื้อหาเรียงลงมาด้านล่าง */
+    .monster-detail-layout {
+        flex-direction: column; 
+    }
+    .monster-image-large {
+        min-width: 100%;
+    }
+    .monster-info {
+        min-width: 100%;
+    }
+    
+    .delete-section {
+        bottom: -40px; 
+    }
+    
+    .nav-dots {
+        right: 10px; /* ขยับจุดกลมๆ ด้านขวาให้ชิดขอบมากขึ้น */
+    }
+    
+    /* ขยับปุ่มปิด (กากบาท) */
+    .close-btn {
+        top: 10px;
+        right: 10px;
+    }
+}

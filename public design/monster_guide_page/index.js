@@ -323,7 +323,7 @@ function onPlayerReady(event) { event.target.mute(); event.target.playVideo(); }
 document.addEventListener('click', function(e) {
     if (e.target.id === 'muteBtn' || e.target.closest('#muteBtn')) return;
     if (player && typeof player.unMute === 'function' && player.isMuted()) {
-        player.unMute(); player.setVolume(50); isMuted = false;
+        player.unMute(); player.setVolume(15); isMuted = false;
         const btn = document.getElementById("muteBtn"); if(btn) btn.innerHTML = "🔊 Mute Music";
     }
 }, { once: true });
@@ -333,4 +333,34 @@ window.toggleMute = function() {
     if (!player) return;
     if (isMuted) { player.unMute(); btn.innerHTML = "🔊 Mute Music"; isMuted = false; } 
     else { player.mute(); btn.innerHTML = "🔇 Unmute Music"; isMuted = true; }
+}
+
+
+// --- ระบบ Touch สำหรับมือถือและไอแพด (Swipe) ---
+let touchStartY = 0;
+let touchEndY = 0;
+
+window.addEventListener('touchstart', e => {
+    touchStartY = e.changedTouches[0].screenY;
+});
+
+window.addEventListener('touchend', e => {
+    // ถ้าเปิดหน้าต่าง Modal อยู่ จะไม่ให้เลื่อนหน้าหลัก
+    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
+    if (isScrolling) return;
+
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    const swipeThreshold = 50; // ต้องปัดนิ้วอย่างน้อย 50px ระบบถึงจะทำงาน
+    if (touchStartY - touchEndY > swipeThreshold) {
+        // ปัดขึ้น -> ไปหน้าถัดไป
+        scrollToSection(currentSection + 1);
+    }
+    if (touchEndY - touchStartY > swipeThreshold) {
+        // ปัดลง -> กลับหน้าก่อนหน้า
+        scrollToSection(currentSection - 1);
+    }
 }
