@@ -340,13 +340,28 @@ window.toggleMute = function() {
 let touchStartY = 0;
 let touchEndY = 0;
 
+// 1. Block native mobile scrolling (Pull-to-refresh) so our custom swipe works
+window.addEventListener('touchmove', e => {
+    // If a modal is open, let the user scroll normally inside the modal
+    if (modal.classList.contains('show') || 
+        document.getElementById('addMonsterModal').classList.contains('show') || 
+        document.getElementById('editMonsterModal').classList.contains('show')) {
+        return; 
+    }
+    
+    // Otherwise, block the default browser scrolling
+    e.preventDefault(); 
+}, { passive: false }); // passive: false is REQUIRED for preventDefault() to work on touch events
+
 window.addEventListener('touchstart', e => {
     touchStartY = e.changedTouches[0].screenY;
-});
+}, { passive: true });
 
 window.addEventListener('touchend', e => {
-    // ถ้าเปิดหน้าต่าง Modal อยู่ จะไม่ให้เลื่อนหน้าหลัก
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
+    if (modal.classList.contains('show') || 
+        document.getElementById('addMonsterModal').classList.contains('show') || 
+        document.getElementById('editMonsterModal').classList.contains('show')) return;
+    
     if (isScrolling) return;
 
     touchEndY = e.changedTouches[0].screenY;
@@ -355,12 +370,12 @@ window.addEventListener('touchend', e => {
 
 function handleSwipe() {
     const swipeThreshold = 50; // ต้องปัดนิ้วอย่างน้อย 50px ระบบถึงจะทำงาน
+    
     if (touchStartY - touchEndY > swipeThreshold) {
-        // ปัดขึ้น -> ไปหน้าถัดไป
+        // ปัดขึ้น -> ไปหน้าถัดไป (Swipe Up)
         scrollToSection(currentSection + 1);
-    }
-    if (touchEndY - touchStartY > swipeThreshold) {
-        // ปัดลง -> กลับหน้าก่อนหน้า
+    } else if (touchEndY - touchStartY > swipeThreshold) {
+        // ปัดลง -> กลับหน้าก่อนหน้า (Swipe Down)
         scrollToSection(currentSection - 1);
     }
 }
