@@ -1,336 +1,269 @@
-let currentSection = 0;
-let totalSections = 3; 
-let isScrolling = false;
-const container = document.getElementById('mainContainer');
-let sections = document.querySelectorAll('.section');
-const modal = document.getElementById('monsterModal');
+const ADMIN_PASSWORD = "admin123";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // --- สถานะแอปพลิเคชัน (State & Mock Data) ---
+        let isAdmin = false;
+        let currentViewingId = null;
 
-// 1. Setup Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyD3jwOwv5FHHi_IM3nVPQNQC6ayPnuylEA",
-  authDomain: "forwebtesting-12636.firebaseapp.com",
-  projectId: "forwebtesting-12636",
-  storageBucket: "forwebtesting-12636.firebasestorage.app",
-  messagingSenderId: "721692467237",
-  appId: "1:721692467237:web:a4eb6e74d05f9c9deddfcc",
-  measurementId: "G-1DR3E38CKP"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+        let monsters = [
+            {
+                id: "m1", 
+                name: "Rathalos",
+                thumb: "https://monsterhunterworld.wiki.fextralife.com/file/Monster-Hunter-World/mhw-rathalos_render_001.png",
+                image: "https://d1lss44jz7tayy.cloudfront.net/space/crop/show/tv/video/asset/2018/01/29/mhw_rathalos_ps4_pro_1080p_1517228308.jpg",
+                desc: "จ้าวแห่งท้องฟ้า (King of the Skies) มังกรบินที่มีความสามารถในการพ่นลูกไฟและมีกรงเล็บอาบยาพิษ",
+                tips: "พก Flash Pods (ระเบิดแสง) ไปเยอะๆ เมื่อมันบินขึ้นฟ้าให้ยิง Flash ใส่หน้า มันจะร่วงลงมาให้เราตีฟรีๆ ตัดหางได้เพื่อลดรัศมีการโจมตี",
+                weakness: ["มังกร", "สายฟ้า"]
+            },
+            {
+                id: "m2", 
+                name: "Great Jagras",
+                thumb: "https://monsterhunterworld.wiki.fextralife.com/file/Monster-Hunter-World/great_jagras_render_001.png",
+                image: "https://images.pushsquare.com/b9ad781b0a850/monster-hunter-world-great-jagras.large.jpg",
+                desc: "มอนสเตอร์สำหรับผู้เริ่มต้น มักจะกลืนเหยื่อทั้งตัวทำให้ท้องป่องและใช้ท้องกลิ้งทับเรา",
+                tips: "มอนสเตอร์ฝึกหัด โจมตีไปที่ท้องตอนที่มันป่องสุดๆ จะทำให้มันล้มได้ง่ายมาก การเคลื่อนไหวช้า หลบออกด้านข้างได้สบาย",
+                weakness: ["ไฟ", "สายฟ้า"]
+            },
+            {
+                id: "m3", 
+                name: "Anjanath",
+                thumb: "https://monsterhunterworld.wiki.fextralife.com/file/Monster-Hunter-World/mhw-anjanath_render_001.png",
+                image: "https://gamewith-en.akamaized.net/article/thumbnail/rectangle/2180.jpg",
+                desc: "ไดโนเสาร์จอมเกรี้ยวกราด อาศัยในป่าทึบ เมื่อโกรธจะมีครีบโผล่ที่หลังและพ่นไฟได้",
+                tips: "ระวังท่ากัดและพ่นไฟตรงหน้า พยายามอยู่ด้านข้างหรือระหว่างขาของมันเพื่อโจมตี เมื่อครีบจมูกมันโผล่ ให้ตีที่จมูกให้แตก",
+                weakness: ["น้ำ", "น้ำแข็ง"]
+            }
+        ];
 
-// เก็บข้อมูลชั่วคราวสำหรับใช้งานตอนกด Edit
-let monstersData = {};
+        // --- ฟังก์ชันหลักในการแสดงผลหน้าจอ (Render UI) ---
+        const grid = document.getElementById('monsterGrid');
+        
+        function renderMonsters(searchQuery = "") {
+            grid.innerHTML = ""; 
+            
+            // กรองข้อมูลตามที่ค้นหา
+            const filtered = monsters.filter(m => 
+                m.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
 
-// 2. The Logic Loop
-async function loadMonsters() {
-    const book = document.getElementById('bookContent');
-    const mainContainer = document.getElementById('mainContainer');
-    const sec2 = document.querySelector('.sec2'); 
-    const sec3 = document.querySelector('.sec3'); 
+            // ถ้าเป็น Admin ให้สร้างปุ่ม "เพิ่มมอนสเตอร์" ไว้ล่วงหน้า
+            if (isAdmin) {
+                const addCard = document.createElement('div');
+                addCard.className = 'monster-card add-card';
+                addCard.style.display = 'flex';
+                addCard.onclick = () => openFormModal();
+                addCard.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    เพิ่มมอนสเตอร์
+                `;
+                grid.appendChild(addCard);
+            }
 
-    book.innerHTML = '';
-    monstersData = {}; 
-
-    const snapshot = await getDocs(collection(db, "monsters"));
-    let monstersArray = [];
-
-    snapshot.forEach((doc) => {
-        const m = doc.data();
-        monstersData[doc.id] = m; // เซฟลง Dictionary
-        monstersArray.push({ type: 'monster', id: doc.id, data: m });
-    });
-
-    // เรียงลำดับจากเก่าไปใหม่
-    monstersArray.sort((a, b) => {
-        const timeA = a.data.createdAt || 0; 
-        const timeB = b.data.createdAt || 0;
-        return timeA - timeB; 
-    });
-
-    let allItems = [...monstersArray];
-
-    // ปุ่ม + อยู่ท้ายสุด
-    allItems.push({ type: 'add_button', id: 'add-btn-unique' });
-
-    // แบ่งหน้า 12 ตัวต่อหน้า
-    const itemsPerPage = 12;
-    const pages = [];
-    for (let i = 0; i < allItems.length; i += itemsPerPage) {
-        pages.push(allItems.slice(i, i + itemsPerPage));
-    }
-
-    document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
-
-    pages.forEach((pageItems, pageIndex) => {
-        let targetGrid;
-
-        if (pageIndex === 0) {
-            targetGrid = sec2.querySelector('.monster-grid');
-            targetGrid.innerHTML = ''; 
-        } else {
-            const newSection = sec2.cloneNode(true);
-            newSection.classList.remove('sec2'); 
-            newSection.classList.add('dynamic-page'); 
-            const title = newSection.querySelector('.monster-list-title');
-            if(title) title.innerText = `Monster List (Page ${pageIndex + 1})`;
-            targetGrid = newSection.querySelector('.monster-grid');
-            targetGrid.innerHTML = ''; 
-            mainContainer.insertBefore(newSection, sec3);
-        }
-
-        pageItems.forEach(item => {
-            if (item.type === 'add_button') {
-                const addCardHTML = `<div class="add-monster-card" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
-                targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
-            } else {
-                const m = item.data;
-                const id = item.id;
-
-                const cardHTML = `
-                    <div class="monster-card" id="card-${id}" style="background-image: url('${m.thumbnail}');">
-                        <div class="monster-name-tag">${m.name}</div>
+            // แสดงรายการมอนสเตอร์
+            filtered.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'monster-card';
+                card.style.backgroundImage = `url('${m.thumb}')`;
+                card.onclick = () => openDetailModal(m.id);
+                card.innerHTML = `
+                    <div class="card-overlay">
+                        <h3 class="card-name">${m.name}</h3>
                     </div>
                 `;
-                targetGrid.insertAdjacentHTML('beforeend', cardHTML);
+                grid.appendChild(card);
+            });
 
-                targetGrid.lastElementChild.addEventListener('click', () => {
-                    openModal(id);
-                });
-
-                if (!document.getElementById(`content-${id}`)) {
-                    const pageHTML = `
-                        <div id="content-${id}" class="monster-detail-layout" style="display: none;">
-                            <div class="monster-image-large">
-                                <img src="${m.detailImage}" alt="${m.name}" />
-                                
-                                <div class="delete-section">
-                                    <div class="delete-confirm" id="confirm-${id}">
-                                        <div class="confirm-text">แน่ใจไหมว่าจะลบ</div>
-                                        <div class="confirm-actions">
-                                            <button class="btn-yes" onclick="deleteMonster('${id}')">ใช่</button>
-                                            <button class="btn-no" onclick="toggleDeleteConfirm('${id}')">ไม่</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <button class="delete-btn" onclick="toggleDeleteConfirm('${id}')" title="ลบมอนสเตอร์">
-                                        <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg>
-                                    </button>
-
-                                    <button class="edit-btn" onclick="openEditModal('${id}')" title="แก้ไขข้อมูล">
-                                        <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="monster-info">
-                                <h2>${m.name}</h2>
-                                <div class="info-section">
-                                    <h3>General Info</h3>
-                                    <p>${m.description}</p>
-                                </div>
-                                <div class="info-section">
-                                    <h3>Weakness</h3>
-                                    <p>${m.weaknessText}</p>
-                                    ${m.weaknessChart ? `<img src="${m.weaknessChart}" class="weakness-img">` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    book.insertAdjacentHTML('beforeend', pageHTML);
-                }
+            // กรณีไม่พบมอนสเตอร์ที่ค้นหา
+            if (filtered.length === 0) {
+                grid.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: #888;">ไม่พบมอนสเตอร์ที่ค้นหา</p>`;
             }
+        }
+
+        // แปลงข้อความจุดอ่อน เป็นไอคอนสวยงาม
+        function getElementBadge(elementName) {
+            const icons = {
+                "ไฟ": { icon: "🔥", color: "#e74c3c", text: "Fire" },
+                "น้ำ": { icon: "💧", color: "#3498db", text: "Water" },
+                "สายฟ้า": { icon: "⚡", color: "#f1c40f", text: "Thunder" },
+                "น้ำแข็ง": { icon: "❄️", color: "#00d2d3", text: "Ice" },
+                "มังกร": { icon: "🐉", color: "#8e44ad", text: "Dragon" }
+            };
+            const el = elementName.trim();
+            
+            if (icons[el]) {
+                return `
+                    <span class="weak-badge" style="color: ${icons[el].color}; border-color: ${icons[el].color};">
+                        ${icons[el].icon} ${icons[el].text}
+                    </span>
+                `;
+            }
+            return `<span class="weak-badge">🎯 ${el}</span>`;
+        }
+
+        // --- ระบบควบคุมป๊อปอัป (Modal Controls) ---
+        function closeModal(e, modalId, force = false) {
+            const modal = document.getElementById(modalId);
+            if (force || e.target === modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function openDetailModal(id) {
+            const m = monsters.find(x => x.id === id);
+            if (!m) return;
+            
+            currentViewingId = id;
+
+            // ใส่ข้อมูลลงในหน้าจอรายละเอียด
+            document.getElementById('viewName').innerText = m.name;
+            document.getElementById('viewImage').src = m.image;
+            document.getElementById('viewDesc').innerText = m.desc;
+            document.getElementById('viewTips').innerText = m.tips || "ไม่มีข้อมูลเพิ่มเติม";
+            
+            // แสดงจุดอ่อน
+            const weakContainer = document.getElementById('viewWeakness');
+            weakContainer.innerHTML = "";
+            if (m.weakness && m.weakness.length > 0) {
+                m.weakness.forEach(w => { 
+                    weakContainer.innerHTML += getElementBadge(w); 
+                });
+            } else {
+                weakContainer.innerHTML = "<span>ไม่มีข้อมูล</span>";
+            }
+
+            // แสดง/ซ่อน ปุ่มแก้ไขและลบตามสิทธิ์
+            document.getElementById('detailAdminControls').style.display = isAdmin ? 'flex' : 'none';
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function openFormModal(editId = null) {
+            const form = document.getElementById('monsterForm');
+            const title = document.getElementById('formTitle');
+            
+            if (editId) {
+                // กรณีแก้ไขข้อมูล (Edit)
+                const m = monsters.find(x => x.id === editId);
+                title.innerText = "✏️ แก้ไขข้อมูล: " + m.name;
+                document.getElementById('formId').value = m.id;
+                document.getElementById('formName').value = m.name;
+                document.getElementById('formThumb').value = m.thumb;
+                document.getElementById('formImage').value = m.image;
+                document.getElementById('formDesc').value = m.desc;
+                document.getElementById('formTips').value = m.tips;
+                document.getElementById('formWeakness').value = m.weakness.join(", ");
+            } else {
+                // กรณีเพิ่มข้อมูลใหม่ (Add)
+                form.reset();
+                title.innerText = "➕ เพิ่มมอนสเตอร์ใหม่";
+                document.getElementById('formId').value = "";
+            }
+            
+            document.getElementById('formModal').classList.add('active');
+        }
+
+        function openEditModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            openFormModal(currentViewingId);
+        }
+
+        // --- ระบบจัดการข้อมูล CRUD (Admin Operations) ---
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('formId').value;
+            const weakInput = document.getElementById('formWeakness').value;
+            
+            const newData = {
+                name: document.getElementById('formName').value,
+                thumb: document.getElementById('formThumb').value,
+                image: document.getElementById('formImage').value,
+                desc: document.getElementById('formDesc').value,
+                tips: document.getElementById('formTips').value,
+                weakness: weakInput ? weakInput.split(",").map(s => s.trim()) : []
+            };
+
+            if (id) {
+                // แก้ไขข้อมูลเดิม
+                const index = monsters.findIndex(x => x.id === id);
+                if (index !== -1) {
+                    monsters[index] = { ...monsters[index], ...newData };
+                    showToast("✅ อัปเดตข้อมูลเรียบร้อย!");
+                }
+            } else {
+                // เพิ่มข้อมูลใหม่
+                newData.id = "m" + Date.now();
+                monsters.push(newData);
+                showToast("✨ เพิ่มมอนสเตอร์ตัวใหม่แล้ว!");
+            }
+
+            document.getElementById('formModal').classList.remove('active');
+            renderMonsters();
+        }
+
+        function deleteCurrentMonster() {
+            if (confirm(`⚠️ คุณแน่ใจหรือไม่ว่าจะลบข้อมูลนี้ทิ้ง?`)) {
+                monsters = monsters.filter(x => x.id !== currentViewingId);
+                document.getElementById('detailModal').classList.remove('active');
+                showToast("🗑️ ลบมอนสเตอร์ออกจากสารบบแล้ว");
+                renderMonsters();
+            }
+        }
+
+        // --- ระบบล็อกอินและฟังก์ชันช่วยเหลือ (Auth & Utils) ---
+        function toggleLoginModal() {
+            if (isAdmin) {
+                // ออกจากระบบ (Logout)
+                isAdmin = false;
+                document.getElementById('authBtn').innerText = "Login Admin";
+                document.getElementById('authBtn').style.color = "";
+                document.getElementById('authBtn').style.borderColor = "";
+                showToast("🔒 ออกจากระบบ (โหมดผู้ใช้ทั่วไป)");
+                renderMonsters();
+            } else {
+                // เปิดหน้าล็อกอิน (Login)
+                document.getElementById('loginPassword').value = "";
+                document.getElementById('loginModal').classList.add('active');
+            }
+        }
+
+        function attemptLogin() {
+            const pw = document.getElementById('loginPassword').value;
+            
+            if (pw === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('authBtn').innerHTML = "⚙️ Logout Admin";
+                document.getElementById('authBtn').style.color = "#D4AF37";
+                document.getElementById('authBtn').style.borderColor = "#D4AF37";
+                showToast("🔓 เข้าสู่ระบบ Admin เรียบร้อย เปิดโหมดแก้ไข");
+                renderMonsters(); 
+            } else {
+                showToast("❌ รหัสผ่านไม่ถูกต้อง");
+            }
+        }
+
+        // แสดงกล่องแจ้งเตือนสวยงามที่มุมจอ
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            toast.className = 'toast';
+            toast.innerText = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = "slideIn 0.3s reverse forwards";
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- จับเหตุการณ์ต่างๆ (Event Listeners) ---
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            renderMonsters(e.target.value);
         });
-    });
 
-    updateNavigation();
-}
-
-function updateNavigation() {
-    sections = document.querySelectorAll('.section'); 
-    totalSections = sections.length;
-    const dotContainer = document.querySelector('.nav-dots');
-    dotContainer.innerHTML = ''; 
-
-    sections.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (index === currentSection) dot.classList.add('active');
-        dot.addEventListener('click', () => scrollToSection(index));
-        dotContainer.appendChild(dot);
-    });
-}
-
-loadMonsters(); 
-
-// --- ระบบ Scroll ---
-function scrollToSection(index) {
-    if (index < 0 || index >= totalSections) return;
-    currentSection = index;
-    container.style.transform = `translateY(-${currentSection * 100}vh)`;
-    sections.forEach(sec => sec.classList.remove('active'));
-    sections[currentSection].classList.add('active');
-    const allDots = document.querySelectorAll('.dot');
-    allDots.forEach(dot => dot.classList.remove('active'));
-    if(allDots[currentSection]) allDots[currentSection].classList.add('active');
-    isScrolling = true;
-    setTimeout(() => { isScrolling = false; }, 1000);
-}
-
-window.addEventListener('wheel', (e) => {
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
-    if (isScrolling) return;
-    if (e.deltaY > 0) scrollToSection(currentSection + 1);
-    else scrollToSection(currentSection - 1);
-});
-
-window.addEventListener('keydown', (e) => {
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
-    if (isScrolling) return;
-    if (e.key === 'ArrowDown') scrollToSection(currentSection + 1);
-    if (e.key === 'ArrowUp') scrollToSection(currentSection - 1);
-});
-
-// --- ระบบ Modal ---
-function openModal(monsterId) {
-    modal.classList.add('show');
-    const allContents = document.querySelectorAll('.monster-detail-layout');
-    allContents.forEach(content => { content.style.display = 'none'; });
-    const targetContent = document.getElementById('content-' + monsterId);
-    if (targetContent) targetContent.style.display = 'flex';
-}
-
-function closeModal() {
-    modal.classList.remove('show');
-    document.querySelectorAll('.delete-confirm').forEach(el => el.classList.remove('show-confirm'));
-}
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-});
-window.closeModal = closeModal;
-
-// --- ➕ เพิ่มมอนสเตอร์ ---
-window.openAddModal = function() { document.getElementById('addMonsterModal').classList.add('show'); }
-window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
-document.getElementById('addMonsterModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('addMonsterModal')) closeAddModal();
-});
-
-document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
-
-    const newMonsterData = {
-        name: document.getElementById('newName').value,
-        thumbnail: document.getElementById('newThumbnail').value,
-        detailImage: document.getElementById('newDetailImage').value,
-        description: document.getElementById('newDescription').value,
-        weaknessText: document.getElementById('newWeaknessText').value,
-        weaknessChart: document.getElementById('newWeaknessChart').value,
-        createdAt: Date.now() 
-    };
-
-    try {
-        await addDoc(collection(db, "monsters"), newMonsterData);
-        alert("✅ เพิ่มสำเร็จ!");
-        closeAddModal(); e.target.reset(); loadMonsters(); 
-    } catch (error) { alert("❌ เกิดข้อผิดพลาด"); } 
-    finally { btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; btn.disabled = false; }
-});
-
-// --- ✏️ แก้ไขมอนสเตอร์ ---
-window.openEditModal = function(id) {
-    const m = monstersData[id];
-    if (m) {
-        document.getElementById('editMonsterId').value = id;
-        document.getElementById('editName').value = m.name;
-        document.getElementById('editThumbnail').value = m.thumbnail;
-        document.getElementById('editDetailImage').value = m.detailImage;
-        document.getElementById('editDescription').value = m.description;
-        document.getElementById('editWeaknessText').value = m.weaknessText;
-        document.getElementById('editWeaknessChart').value = m.weaknessChart || '';
-        document.getElementById('editMonsterModal').classList.add('show');
-    }
-}
-window.closeEditModal = function() { document.getElementById('editMonsterModal').classList.remove('show'); }
-document.getElementById('editMonsterModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('editMonsterModal')) closeEditModal();
-});
-
-document.getElementById('editMonsterForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังอัปเดต..."; btn.disabled = true;
-    const id = document.getElementById('editMonsterId').value;
-    
-    const updatedData = {
-        name: document.getElementById('editName').value,
-        thumbnail: document.getElementById('editThumbnail').value,
-        detailImage: document.getElementById('editDetailImage').value,
-        description: document.getElementById('editDescription').value,
-        weaknessText: document.getElementById('editWeaknessText').value,
-        weaknessChart: document.getElementById('editWeaknessChart').value
-    };
-
-    try {
-        await updateDoc(doc(db, "monsters", id), updatedData);
-        alert("✅ แก้ไขเรียบร้อย!");
-        closeEditModal(); closeModal(); loadMonsters();
-    } catch (error) { alert("❌ เกิดข้อผิดพลาด"); } 
-    finally { btn.innerHTML = "บันทึกการแก้ไข"; btn.disabled = false; }
-});
-
-// --- 🗑️ ลบมอนสเตอร์ ---
-window.toggleDeleteConfirm = function(id) {
-    const confirmBox = document.getElementById(`confirm-${id}`);
-    if (confirmBox) confirmBox.classList.toggle('show-confirm');
-}
-window.deleteMonster = async function(id) {
-    try {
-        closeModal();
-        await deleteDoc(doc(db, "monsters", id));
-        alert("🗑️ ลบข้อมูลเรียบร้อยแล้ว!"); loadMonsters(); 
-    } catch (error) { alert("❌ เกิดข้อผิดพลาดในการลบ"); }
-}
-
-// --- 🎵 เสียง YouTube ---
-var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-var firstScriptTag = document.getElementsByTagName('script')[0];
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-var player;
-var isMuted = true;
-
-window.onYouTubeIframeAPIReady = function() {
-    player = new YT.Player('youtube-player', {
-        height: '0', width: '0', videoId: 'po_t8I9FC2Y',
-        playerVars: { 'autoplay': 1, 'loop': 1, 'controls': 0, 'playlist': 'po_t8I9FC2Y' },
-        events: { 'onReady': onPlayerReady }
-    });
-}
-function onPlayerReady(event) { event.target.mute(); event.target.playVideo(); }
-
-document.addEventListener('click', function(e) {
-    if (e.target.id === 'muteBtn' || e.target.closest('#muteBtn')) return;
-    if (player && typeof player.unMute === 'function' && player.isMuted()) {
-        player.unMute(); player.setVolume(15); isMuted = false;
-        const btn = document.getElementById("muteBtn"); if(btn) btn.innerHTML = "🔊 Mute Music";
-    }
-}, { once: true });
-
-window.toggleMute = function() {
-    const btn = document.getElementById("muteBtn");
-    if (!player) return;
-    if (isMuted) { player.unMute(); btn.innerHTML = "🔊 Mute Music"; isMuted = false; } 
-    else { player.mute(); btn.innerHTML = "🔇 Unmute Music"; isMuted = true; }
-}
+        // เริ่มต้นการทำงานเมื่อโหลดหน้าเว็บเสร็จ
+        window.onload = () => {
+            renderMonsters();
+        };

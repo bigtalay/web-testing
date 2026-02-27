@@ -7,116 +7,135 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <div class="main-container" id="mainContainer">
-      <div class="audio-container">
-        <div id="youtube-player"></div>
-        <button onclick="toggleMute()" id="muteBtn" class="game-button">
-          🔊 Mute Music
-        </button>
-      </div>
-
-      <div class="section sec1 active">
-        <div class="scroll-down" onclick="scrollToSection(1)">
-          <div class="arrow"></div>
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                Guild Database
+            </div>
+            <div class="header-tools">
+                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 ค้นหามอนสเตอร์...">
+                <button id="authBtn" class="btn-auth" onclick="toggleLoginModal()">Login Admin</button>
+            </div>
         </div>
-      </div>
+    </header>
 
-      <div class="section sec2">
-        <h1 class="monster-list-title">Monster List</h1>
-        <div class="monster-grid" id="monsterGrid"></div>
-      </div>
-
-      <div class="section sec3">
-        <h1 style="color: white; z-index: 2">More to come...</h1>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="monsterModal">
-      <div class="book-container">
-        <div class="close-btn" onclick="closeModal()">&times;</div>
-        <div class="book-content-scroll" id="bookContent"></div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="addMonsterModal">
-      <div class="book-container add-form-container">
-        <div class="close-btn" onclick="closeAddModal()">&times;</div>
-        <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #5f4b8b;">+ เพิ่มมอนสเตอร์ใหม่</h2>
-          <form id="addMonsterForm" class="monster-form">
-            <div class="input-group">
-              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input type="text" id="newName" placeholder="เช่น Great Jagras" required>
-            </div>
-            <div class="input-group">
-              <label>2. รูปปก Icon (URL):</label>
-              <input type="url" id="newThumbnail" placeholder="ลิ้งก์รูปภาพสี่เหลี่ยมจัตุรัส" required>
-            </div>
-            <div class="input-group">
-              <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
-              <input type="url" id="newDetailImage" placeholder="ลิ้งก์รูปมอนสเตอร์ตัวเต็ม" required>
-            </div>
-            <div class="input-group">
-              <label>4. รายละเอียด (General Info):</label>
-              <textarea id="newDescription" rows="4" placeholder="ข้อมูลทั่วไปของมอนสเตอร์..." required></textarea>
-            </div>
-            <div class="input-group">
-              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <input type="text" id="newWeaknessText" placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️" required>
-            </div>
-            <div class="input-group">
-              <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
-              <input type="url" id="newWeaknessChart" placeholder="ลิ้งก์รูปตารางจุดอ่อน">
-            </div>
-            <button type="submit" class="game-button submit-btn">บันทึกข้อมูลมอนสเตอร์</button>
-          </form>
+    <!-- ส่วนต้อนรับ (Hero) -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Monster Hunter Guide</h1>
+            <p>ฐานข้อมูลจุดอ่อนและเทคนิคการล่า สำหรับฮันเตอร์มือใหม่</p>
         </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="modal-overlay" id="editMonsterModal">
-      <div class="book-container add-form-container">
-        <div class="close-btn" onclick="closeEditModal()">&times;</div>
-        <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #1565c0;">📝 แก้ไขข้อมูลมอนสเตอร์</h2>
-          <form id="editMonsterForm" class="monster-form">
-            <input type="hidden" id="editMonsterId">
-            <div class="input-group">
-              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input type="text" id="editName" required>
-            </div>
-            <div class="input-group">
-              <label>2. รูปปก Icon (URL):</label>
-              <input type="url" id="editThumbnail" required>
-            </div>
-            <div class="input-group">
-              <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
-              <input type="url" id="editDetailImage" required>
-            </div>
-            <div class="input-group">
-              <label>4. รายละเอียด (General Info):</label>
-              <textarea id="editDescription" rows="4" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <input type="text" id="editWeaknessText" required>
-            </div>
-            <div class="input-group">
-              <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
-              <input type="url" id="editWeaknessChart">
-            </div>
-            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0;">บันทึกการแก้ไข</button>
-          </form>
+    <!-- พื้นที่แสดงข้อมูลหลัก (Main Content) -->
+    <main class="main-content">
+        <div class="section-title">
+            <h2>รายชื่อมอนสเตอร์ (Monster List)</h2>
         </div>
-      </div>
+        <div class="grid-layout" id="monsterGrid">
+            <!-- ข้อมูลมอนสเตอร์จะถูกแทรกที่นี่ด้วย JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal: ป๊อปอัปดูข้อมูลมอนสเตอร์ (Detail) -->
+    <div class="modal-overlay" id="detailModal" onclick="closeModal(event, 'detailModal')">
+        <div class="book-modal">
+            <div class="modal-header">
+                <h2 id="viewName">Monster Name</h2>
+                <button class="close-btn" onclick="closeModal(event, 'detailModal', true)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-layout">
+                    <div class="detail-img">
+                        <img id="viewImage" src="" alt="Monster">
+                    </div>
+                    <div class="detail-info">
+                        <div class="info-box">
+                            <h3>📖 ข้อมูลทั่วไป (General Info)</h3>
+                            <p id="viewDesc">Description goes here</p>
+                        </div>
+                        <div class="info-box">
+                            <h3>🎯 จุดอ่อน (Weaknesses)</h3>
+                            <div class="weakness-icons" id="viewWeakness"></div>
+                        </div>
+                        <div class="info-box" style="background: rgba(212, 175, 55, 0.1); border-color: var(--mh-gold);">
+                            <h3>⚔️ เทคนิคการสู้ (Combat Tips)</h3>
+                            <p id="viewTips">Tips go here</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- กลุ่มปุ่มแก้ไข/ลบ จะแสดงเฉพาะตอนที่ Admin เข้าระบบแล้ว -->
+                <div class="admin-controls" id="detailAdminControls">
+                    <button class="btn-edit" onclick="openEditModal()">✏️ แก้ไขข้อมูล</button>
+                    <button class="btn-delete" onclick="deleteCurrentMonster()">🗑️ ลบมอนสเตอร์</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="nav-dots">
-      <div class="dot active" onclick="scrollToSection(0)"></div>
-      <div class="dot" onclick="scrollToSection(1)"></div>
-      <div class="dot" onclick="scrollToSection(2)"></div>
+    <!-- Modal: ป๊อปอัปฟอร์มเพิ่ม/แก้ไขมอนสเตอร์ (Form) -->
+    <div class="modal-overlay" id="formModal" onclick="closeModal(event, 'formModal')">
+        <div class="book-modal">
+            <div class="modal-header">
+                <h2 id="formTitle">เพิ่มมอนสเตอร์ใหม่</h2>
+                <button class="close-btn" onclick="closeModal(event, 'formModal', true)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="monsterForm" class="mh-form" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="formId">
+                    <div class="form-group">
+                        <label>ชื่อมอนสเตอร์:</label>
+                        <input type="text" id="formName" required placeholder="เช่น Rathalos">
+                    </div>
+                    <div class="form-group">
+                        <label>URL รูปภาพปก (แนวตั้ง/จัตุรัส):</label>
+                        <input type="url" id="formThumb" required placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>URL รูปภาพเต็ม (แนวนอน):</label>
+                        <input type="url" id="formImage" required placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>รายละเอียด:</label>
+                        <textarea id="formDesc" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>เทคนิคการสู้ (แนะนำมือใหม่):</label>
+                        <textarea id="formTips" rows="3" required placeholder="โจมตีที่หัว, ใช้ระเบิดแสง..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>จุดอ่อนหลัก (คั่นด้วยลูกน้ำ เช่น ไฟ,มังกร):</label>
+                        <input type="text" id="formWeakness" placeholder="ไฟ, น้ำ, สายฟ้า, น้ำแข็ง, มังกร">
+                    </div>
+                    <button type="submit" class="btn-submit">💾 บันทึกข้อมูล</button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <script type="module" src="index.js"></script>
+    <!-- Modal: ป๊อปอัปสำหรับ Login เข้าสู่ระบบ Admin -->
+    <div class="modal-overlay" id="loginModal" onclick="closeModal(event, 'loginModal')">
+        <div class="book-modal">
+            <div class="modal-header">
+                <h2>Admin Login</h2>
+                <button class="close-btn" onclick="closeModal(event, 'loginModal', true)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>กรุณาใส่รหัสผ่านเพื่อเข้าสู่โหมดแก้ไขข้อมูล</p>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="รหัสผ่านแอดมิน">
+                </div>
+                <button class="btn-submit" style="width: 100%;" onclick="attemptLogin()">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- คอนเทนเนอร์สำหรับแสดงแจ้งเตือน (Toast) -->
+    <div id="toast-container"></div>
+    <script src="index.js"></script>
   </body>
 </html>
