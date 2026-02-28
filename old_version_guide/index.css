@@ -250,3 +250,8 @@ h2 { margin-top: 0; color: #5f4b8b; }
   border-color: #e74c3c !important;
   color: white !important;
 }
+
+/* Hide Admin tools from regular users */
+body:not(.admin-logged-in) .admin-only {
+  display: none !important;
+}

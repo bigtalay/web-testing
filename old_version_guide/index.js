@@ -83,8 +83,9 @@ async function loadMonsters() {
 
         pageItems.forEach(item => {
             if (item.type === 'add_button') {
-                const addCardHTML = `<div class="add-monster-card" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
-                targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
+                // It should look exactly like this:
+const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
+    targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
             } else {
                 const m = item.data;
                 const id = item.id;
@@ -103,10 +104,11 @@ async function loadMonsters() {
                 if (!document.getElementById(`content-${id}`)) {
                     const pageHTML = `
                         <div id="content-${id}" class="monster-detail-layout" style="display: none;">
+                            
                             <div class="monster-image-large">
                                 <img src="${m.detailImage}" alt="${m.name}" />
-                                
-                                <div class="delete-section">
+
+                                <div class="delete-section admin-only">
                                     <div class="delete-confirm" id="confirm-${id}">
                                         <div class="confirm-text">แน่ใจไหมว่าจะลบ</div>
                                         <div class="confirm-actions">
@@ -131,6 +133,7 @@ async function loadMonsters() {
                                     </button>
                                 </div>
                             </div>
+                            
                             <div class="monster-info">
                                 <h2>${m.name}</h2>
                                 <div class="info-section">
@@ -143,6 +146,7 @@ async function loadMonsters() {
                                     ${m.weaknessChart ? `<img src="${m.weaknessChart}" class="weakness-img">` : ''}
                                 </div>
                             </div>
+
                         </div>
                     `;
                     book.insertAdjacentHTML('beforeend', pageHTML);
@@ -434,31 +438,33 @@ window.closeLoginModal = function() {
 }
 
 window.handleSuccessfulLogin = function() {
-    // 1. Show the Admin Panel
     const panel = document.getElementById('admin-panel');
     if (panel) panel.style.display = 'block';
 
-    // 2. SWAP THE BUTTONS (Hide Login, Show Logout)
+    // Swap buttons
     document.getElementById('btn-login').style.display = 'none';
-    document.getElementById('btn-logout').style.display = 'flex'; // flex keeps the icon aligned!
+    document.getElementById('btn-logout').style.display = 'flex'; 
     
-    // Set a flag that you are logged in
+    // THIS MUST BE "ADD" (It turns the tools ON)
+    document.body.classList.add('admin-logged-in');
+    
     window.isAdminLoggedIn = true; 
 }
 
 window.logoutAdmin = function() {
-    // 1. Hide the Admin Panel
     const panel = document.getElementById('admin-panel');
     if (panel) panel.style.display = 'none';
 
-    // 2. SWAP THE BUTTONS BACK (Hide Logout, Show Login)
+    // Swap buttons back
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('btn-login').style.display = 'flex'; 
+    
+    // THIS MUST BE "REMOVE" (It turns the tools OFF)
+    document.body.classList.remove('admin-logged-in');
     
     window.isAdminLoggedIn = false;
     alert("Logged out successfully.");
 }
-
 // ==========================================
 // 2. FORM SUBMISSION LOGIC
 // ==========================================
