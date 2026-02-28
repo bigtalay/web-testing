@@ -207,3 +207,46 @@ h2 { margin-top: 0; color: #5f4b8b; }
     .nav-dots { right: 10px; }
     .close-btn { top: 10px; right: 10px; }
 }
+
+/* Styling for the top-right Admin button */
+.admin-top-right-btn {
+  position: absolute; /* Change to 'fixed' if you want it to scroll with you */
+  top: 25px;
+  right: 220px;
+  
+  /* Flexbox to align the icon and text */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  /* Visual styling */
+  background: rgba(30, 30, 30, 0.8); /* Semi-transparent dark background */
+  color: #ffffff;
+  border: 1px solid #444;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  
+  /* Ensures it sits on top of background images/content */
+  z-index: 100; 
+  
+  /* Smooth animation for hovering */
+  transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.admin-top-right-btn:hover {
+  background: #ffcc00; /* Gold highlight */
+  color: #000000;      /* Dark text on hover */
+  border-color: #ffcc00;
+  transform: scale(1.05); /* Slight pop effect */
+}
+
+/* Make the logout button look a little different when hovered */
+.logout-variant:hover {
+  background: #e74c3c !important; /* Red background */
+  border-color: #e74c3c !important;
+  color: white !important;
+}

@@ -171,6 +171,7 @@ function updateNavigation() {
 
 loadMonsters(); 
 
+
 // --- ระบบ Scroll ---
 function scrollToSection(index) {
     if (index < 0 || index >= totalSections) return;
@@ -379,3 +380,108 @@ function handleSwipe() {
         scrollToSection(currentSection - 1);
     }
 }
+
+// ==========================================
+// 1. FUNCTIONS TRIGGERED BY HTML BUTTONS
+// (These must stay outside the DOMContentLoaded block)
+// ==========================================
+
+function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleSuccessfulLogin() {
+    // 1. Show the Admin Panel
+    const panel = document.getElementById('admin-panel');
+    if (panel) panel.style.display = 'block';
+
+    // 2. Hide the top-right Admin button so it's out of the way
+    const adminBtn = document.querySelector('.admin-top-right-btn');
+    if (adminBtn) adminBtn.style.display = 'none';
+}
+
+function logoutAdmin() {
+    // 1. Hide the Admin Panel
+    const panel = document.getElementById('admin-panel');
+    if (panel) panel.style.display = 'none';
+
+    // 2. Bring back the top-right Admin button
+    const adminBtn = document.querySelector('.admin-top-right-btn');
+    if (adminBtn) adminBtn.style.display = 'flex'; // We used flex in the CSS!
+
+    alert("Logged out successfully.");
+}
+
+// ==========================================
+// 1. FUNCTIONS TRIGGERED BY HTML BUTTONS
+// (Attached to 'window' so HTML can see them inside a Module)
+// ==========================================
+
+window.openLoginModal = function() {
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
+window.closeLoginModal = function() {
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+window.handleSuccessfulLogin = function() {
+    // 1. Show the Admin Panel
+    const panel = document.getElementById('admin-panel');
+    if (panel) panel.style.display = 'block';
+
+    // 2. SWAP THE BUTTONS (Hide Login, Show Logout)
+    document.getElementById('btn-login').style.display = 'none';
+    document.getElementById('btn-logout').style.display = 'flex'; // flex keeps the icon aligned!
+    
+    // Set a flag that you are logged in
+    window.isAdminLoggedIn = true; 
+}
+
+window.logoutAdmin = function() {
+    // 1. Hide the Admin Panel
+    const panel = document.getElementById('admin-panel');
+    if (panel) panel.style.display = 'none';
+
+    // 2. SWAP THE BUTTONS BACK (Hide Logout, Show Login)
+    document.getElementById('btn-logout').style.display = 'none';
+    document.getElementById('btn-login').style.display = 'flex'; 
+    
+    window.isAdminLoggedIn = false;
+    alert("Logged out successfully.");
+}
+
+// ==========================================
+// 2. FORM SUBMISSION LOGIC
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const loginForm = document.getElementById('admin-login-form');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            const user = this.querySelector('input[type="text"]').value;
+            const pass = this.querySelector('input[type="password"]').value;
+
+            if (user === "root" && pass === "root") {
+                window.closeLoginModal();
+                window.handleSuccessfulLogin();
+                this.reset(); 
+            } else {
+                alert("Invalid Username or Password.");
+                this.querySelector('input[type="password"]').value = ""; 
+            }
+        });
+    }
+});
