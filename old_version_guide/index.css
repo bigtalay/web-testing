@@ -107,7 +107,14 @@ h2 { margin-top: 0; color: #5f4b8b; }
 .dot.active { background: white; transform: scale(1.5); }
 
 /* ปุ่มเสียง */
-.audio-container { position: absolute; top: 25px; right: 25px; z-index: 1000; }
+.audio-container { 
+    position: absolute; 
+    bottom: 25px; 
+    left: 25px; 
+    right: auto; 
+    top: auto; 
+    z-index: 1000; 
+}
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
     padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
@@ -157,8 +164,6 @@ h2 { margin-top: 0; color: #5f4b8b; }
 .btn-yes { border-right: 2px solid #000 !important; }
 .btn-yes:hover { background: rgba(255, 0, 0, 0.2); }
 .btn-no:hover { background: rgba(0, 0, 0, 0.1); }
-
-
 
 /* =========================================
    📱 โค้ดสำหรับหน้าจอต่างๆ (เรียงจากใหญ่ไปเล็กเสมอ!)
@@ -254,4 +259,161 @@ h2 { margin-top: 0; color: #5f4b8b; }
 /* Hide Admin tools from regular users */
 body:not(.admin-logged-in) .admin-only {
   display: none !important;
+}
+
+/* =========================================
+   Hero Section & Navigation (MHW Theme Layout)
+   ========================================= */
+
+.sec1 {
+    justify-content: flex-start;
+}
+
+.top-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    z-index: 10;
+}
+
+.nav-brand {
+    color: #e3c16f;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: color 0.3s;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+}
+
+.nav-links a:hover {
+    color: #e3c16f;
+}
+
+/* Safely override absolute positioning for your existing admin buttons so they sit cleanly in the nav */
+.nav-actions {
+    display: flex;
+    gap: 10px;
+}
+.nav-actions .admin-top-right-btn {
+    position: relative;
+    top: auto;
+    right: auto;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+    z-index: 2;
+    padding: 0 20px;
+    margin-top: -80px; 
+}
+
+.hero-title {
+    font-size: 5.5rem;
+    color: #fff;
+    margin: 0;
+    line-height: 1.1;
+    text-shadow: 4px 4px 10px rgba(0,0,0,0.9);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    color: #ddd;
+    font-size: 1.3rem;
+    margin: 25px 0 45px;
+    max-width: 800px;
+    line-height: 1.6;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+    font-weight: 500;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+/* Themed buttons to match your existing game aesthetics */
+.primary-btn, .secondary-btn {
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+}
+
+.primary-btn {
+    background: #e3c16f;
+    color: #2b2b2b;
+    border: 2px solid #e3c16f;
+    box-shadow: 0 4px 15px rgba(227, 193, 111, 0.4);
+}
+
+.primary-btn:hover {
+    background: #fff;
+    border-color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6);
+}
+
+.secondary-btn {
+    background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%);
+    color: #e3c16f;
+    border: 2px solid #e3c16f;
+}
+
+.secondary-btn:hover {
+    background: #e3c16f;
+    color: #2b2b2b;
+    transform: translateY(-3px);
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 768px) {
+    .top-nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    .hero-title {
+        font-size: 3rem;
+    }
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+    }
 }
