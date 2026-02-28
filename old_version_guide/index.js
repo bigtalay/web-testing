@@ -242,32 +242,7 @@ window.closeModal = closeModal;
 
 window.openAddModal = function() { document.getElementById('addMonsterModal').classList.add('show'); }
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
-document.getElementById('addMonsterModal').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('addMonsterModal')) closeAddModal();
-});
 
-document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
-
-    const newMonsterData = {
-        name: document.getElementById('newName').value,
-        thumbnail: document.getElementById('newThumbnail').value,
-        detailImage: document.getElementById('newDetailImage').value,
-        description: document.getElementById('newDescription').value,
-        weaknessText: document.getElementById('newWeaknessText').value,
-        weaknessChart: document.getElementById('newWeaknessChart').value,
-        createdAt: Date.now() 
-    };
-
-    try {
-        await addDoc(collection(db, "monsters"), newMonsterData);
-        alert("✅ เพิ่มสำเร็จ!");
-        closeAddModal(); e.target.reset(); loadMonsters(); 
-    } catch (error) { alert("❌ เกิดข้อผิดพลาด"); } 
-    finally { btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; btn.disabled = false; }
-});
 
 window.openEditModal = function(id) {
     const m = monstersData[id];
@@ -432,5 +407,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.querySelector('input[type="password"]').value = ""; 
             }
         });
+    }
+});
+
+// Helper function: Converts an image file into a Base64 text string
+function convertFileToBase64(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(""); // Return empty string if no file is selected
+            return;
+        }
+
+        // Check file size (1MB limit = 1,048,576 bytes)
+        if (file.size > 1048576) {
+            reject("ไฟล์ใหญ่เกินไป! กรุณาใช้รูปภาพขนาดไม่เกิน 1MB");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
+
+    try {
+        // Convert the files to Base64 strings instead of grabbing the useless '.value'
+        const thumbnailBase64 = await convertFileToBase64(document.getElementById('newThumbnail'));
+        const detailImageBase64 = await convertFileToBase64(document.getElementById('newDetailImage'));
+        const weaknessChartBase64 = await convertFileToBase64(document.getElementById('newWeaknessChart'));
+
+        const newMonsterData = {
+            name: document.getElementById('newName').value,
+            thumbnail: thumbnailBase64,
+            detailImage: detailImageBase64,
+            description: document.getElementById('newDescription').value,
+            weaknessText: document.getElementById('newWeaknessText').value,
+            weaknessChart: weaknessChartBase64,
+            createdAt: Date.now() 
+        };
+
+        await addDoc(collection(db, "monsters"), newMonsterData);
+        alert("✅ เพิ่มสำเร็จ!");
+        closeAddModal(); 
+        e.target.reset(); 
+        loadMonsters(); 
+    } catch (error) { 
+        console.error(error);
+        alert("❌ " + error); 
+    } finally { 
+        btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; 
+        btn.disabled = false; 
     }
 });
