@@ -17,7 +17,6 @@
       </div>
 
       <div class="section sec1 active">
-        
         <button id="btn-login" class="admin-top-right-btn" onclick="openLoginModal()">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -54,6 +53,11 @@
 
       <div class="section sec2">
         <h1 class="monster-list-title">Monster List</h1>
+        
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อมอนสเตอร์ (เช่น Rathalos)..." onkeyup="handleSearch(this.value)" />
+        </div>
+
         <div class="monster-grid" id="monsterGrid"></div>
       </div>
 
@@ -73,9 +77,7 @@
       <div class="book-container add-form-container">
         <div class="close-btn" onclick="closeAddModal()">&times;</div>
         <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #5f4b8b">
-            + เพิ่มมอนสเตอร์ใหม่
-          </h2>
+          <h2 style="text-align: center; color: #5f4b8b">+ เพิ่มมอนสเตอร์ใหม่</h2>
           <form id="addMonsterForm" class="monster-form">
             <div class="input-group">
               <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
@@ -101,9 +103,7 @@
               <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
               <input type="url" id="newWeaknessChart" placeholder="ลิ้งก์รูปตารางจุดอ่อน" />
             </div>
-            <button type="submit" class="game-button submit-btn">
-              บันทึกข้อมูลมอนสเตอร์
-            </button>
+            <button type="submit" class="game-button submit-btn">บันทึกข้อมูลมอนสเตอร์</button>
           </form>
         </div>
       </div>
@@ -113,9 +113,7 @@
       <div class="book-container add-form-container">
         <div class="close-btn" onclick="closeEditModal()">&times;</div>
         <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #1565c0">
-            📝 แก้ไขข้อมูลมอนสเตอร์
-          </h2>
+          <h2 style="text-align: center; color: #1565c0">📝 แก้ไขข้อมูลมอนสเตอร์</h2>
           <form id="editMonsterForm" class="monster-form">
             <input type="hidden" id="editMonsterId" />
             <div class="input-group">
@@ -142,9 +140,7 @@
               <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
               <input type="url" id="editWeaknessChart" />
             </div>
-            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">
-              บันทึกการแก้ไข
-            </button>
+            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">บันทึกการแก้ไข</button>
           </form>
         </div>
       </div>
@@ -158,19 +154,13 @@
 
     <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; justify-content: center; align-items: center;">
       <div style="background: #2a2a2a; padding: 30px; border-radius: 10px; border: 1px solid #444; width: 300px;">
-        <h2 style="color: white; margin-top: 0; text-align: center">
-          Admin Login
-        </h2>
+        <h2 style="color: white; margin-top: 0; text-align: center">Admin Login</h2>
         <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 15px">
           <input type="text" placeholder="Username" required style="padding: 10px; border-radius: 5px; border: none" />
           <input type="password" placeholder="Password" required style="padding: 10px; border-radius: 5px; border: none" />
           <div style="display: flex; gap: 10px">
-            <button type="submit" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              Login
-            </button>
-            <button type="button" onclick="closeLoginModal()" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              Cancel
-            </button>
+            <button type="submit" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Login</button>
+            <button type="button" onclick="closeLoginModal()" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
           </div>
         </form>
       </div>

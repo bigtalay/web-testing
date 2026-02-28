@@ -38,7 +38,34 @@ body, html {
 }
 
 .sec1 .monster-grid { position: relative; z-index: 2; }
-.monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px; }
+.monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 10px; }
+
+/* ➕ CSS สำหรับช่องค้นหา */
+.search-container {
+    width: 90%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    z-index: 2;
+    position: relative;
+}
+#searchInput {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    border-radius: 25px;
+    border: 2px solid #e3c16f;
+    background: rgba(30, 30, 30, 0.8);
+    color: white;
+    outline: none;
+    transition: all 0.3s;
+    font-family: 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+}
+#searchInput::placeholder { color: #ccc; }
+#searchInput:focus {
+    background: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 15px rgba(227, 193, 111, 0.5);
+}
 
 /* Grid การ์ดมอนสเตอร์ */
 .monster-grid {
@@ -107,7 +134,7 @@ h2 { margin-top: 0; color: #5f4b8b; }
 }
 .game-button:hover { background: #e3c16f; color: #2b2b2b; box-shadow: 0 0 20px rgba(227, 193, 111, 0.8); }
 
-/* ปุ่ม Admin (Login / Logout) ขวาบน */
+/* ปุ่ม Admin ขวาบน */
 .admin-top-right-btn {
   position: absolute; 
   top: 25px;
@@ -144,10 +171,7 @@ body:not(.admin-logged-in) .admin-only {
   display: none !important;
 }
 
-/* =========================================
-   Hero Section กลางจอ (MHW Theme Layout)
-   ========================================= */
-
+/* Hero Section */
 .hero-content {
     display: flex;
     flex-direction: column;
@@ -178,10 +202,7 @@ body:not(.admin-logged-in) .admin-only {
     font-weight: 500;
 }
 
-.hero-buttons {
-    display: flex;
-    gap: 20px;
-}
+.hero-buttons { display: flex; gap: 20px; }
 
 .primary-btn {
     padding: 15px 35px;
@@ -245,7 +266,7 @@ body:not(.admin-logged-in) .admin-only {
 .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
 .dot.active { background: white; transform: scale(1.5); }
 
-/* ปุ่มเพิ่มมอนสเตอร์ และฟอร์มต่างๆ */
+/* ปุ่มและฟอร์มต่างๆ */
 .add-monster-card { background-color: #444; display: flex; justify-content: center; align-items: center; border: 3px dashed #777; transition: all 0.3s; }
 .add-monster-card:hover { transform: scale(1.05) translateY(-10px); background-color: #555; border-color: #e3c16f; box-shadow: 0 10px 20px rgba(227, 193, 111, 0.3); }
 .add-icon { font-size: 3rem; color: #888; transition: color 0.3s; }

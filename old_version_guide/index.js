@@ -21,32 +21,45 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let monstersData = {};
+let allMonstersArray = []; // ➕ เก็บข้อมูลทั้งหมดไว้ค้นหา
 
 async function loadMonsters() {
-    const book = document.getElementById('bookContent');
-    const mainContainer = document.getElementById('mainContainer');
-    const sec2 = document.querySelector('.sec2'); 
-    const sec3 = document.querySelector('.sec3'); 
-
-    book.innerHTML = '';
-    monstersData = {}; 
-
     const snapshot = await getDocs(collection(db, "monsters"));
-    let monstersArray = [];
+    allMonstersArray = [];
+    monstersData = {}; 
 
     snapshot.forEach((doc) => {
         const m = doc.data();
         monstersData[doc.id] = m;
-        monstersArray.push({ type: 'monster', id: doc.id, data: m });
+        allMonstersArray.push({ type: 'monster', id: doc.id, data: m });
     });
 
-    monstersArray.sort((a, b) => {
+    allMonstersArray.sort((a, b) => {
         const timeA = a.data.createdAt || 0; 
         const timeB = b.data.createdAt || 0;
         return timeA - timeB; 
     });
 
-    let allItems = [...monstersArray];
+    // ตรวจสอบว่ามีคำค้นหาค้างอยู่ไหมก่อนวาดใหม่
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim() !== "") {
+        handleSearch(searchInput.value);
+    } else {
+        renderMonsterGrid(allMonstersArray);
+    }
+}
+
+// ➕ ฟังก์ชันใหม่สำหรับวาด Grid (แยกออกมาเพื่อให้ค้นหาแล้ววาดใหม่ได้เลย)
+function renderMonsterGrid(monstersToRender) {
+    const book = document.getElementById('bookContent');
+    const mainContainer = document.getElementById('mainContainer');
+    const sec2 = document.querySelector('.sec2'); 
+    const sec3 = document.querySelector('.sec3'); 
+
+    document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
+    book.innerHTML = ''; 
+
+    let allItems = [...monstersToRender];
     allItems.push({ type: 'add_button', id: 'add-btn-unique' });
 
     const itemsPerPage = 12;
@@ -54,8 +67,6 @@ async function loadMonsters() {
     for (let i = 0; i < allItems.length; i += itemsPerPage) {
         pages.push(allItems.slice(i, i + itemsPerPage));
     }
-
-    document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
 
     pages.forEach((pageItems, pageIndex) => {
         let targetGrid;
@@ -67,6 +78,11 @@ async function loadMonsters() {
             const newSection = sec2.cloneNode(true);
             newSection.classList.remove('sec2'); 
             newSection.classList.add('dynamic-page'); 
+            
+            // ลบช่องค้นหาในหน้าถัดๆ ไป (ให้มีช่องค้นหาแค่หน้าแรกพอ)
+            const searchBox = newSection.querySelector('.search-container');
+            if (searchBox) searchBox.remove();
+
             const title = newSection.querySelector('.monster-list-title');
             if(title) title.innerText = `Monster List (Page ${pageIndex + 1})`;
             targetGrid = newSection.querySelector('.monster-grid');
@@ -143,19 +159,41 @@ async function loadMonsters() {
     updateNavigation();
 }
 
+// ➕ ฟังก์ชันค้นหา (พิมพ์เล็กใหญ่หาเจอหมด)
+window.handleSearch = function(searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+    let filtered = [];
+    
+    if (term === "") {
+        filtered = allMonstersArray;
+    } else {
+        filtered = allMonstersArray.filter(item => 
+            item.data.name.toLowerCase().includes(term)
+        );
+    }
+    
+    // บังคับสไลด์ไปที่หน้าแรกของ Monster List เวลาค้นหา
+    if (currentSection > 1) {
+        scrollToSection(1);
+    }
+    
+    renderMonsterGrid(filtered);
+}
+
 function updateNavigation() {
     sections = document.querySelectorAll('.section'); 
     totalSections = sections.length;
     const dotContainer = document.querySelector('.nav-dots');
-    dotContainer.innerHTML = ''; 
-
-    sections.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (index === currentSection) dot.classList.add('active');
-        dot.addEventListener('click', () => scrollToSection(index));
-        dotContainer.appendChild(dot);
-    });
+    if(dotContainer) {
+        dotContainer.innerHTML = ''; 
+        sections.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === currentSection) dot.classList.add('active');
+            dot.addEventListener('click', () => scrollToSection(index));
+            dotContainer.appendChild(dot);
+        });
+    }
 }
 
 loadMonsters(); 
@@ -173,7 +211,6 @@ function scrollToSection(index) {
     isScrolling = true;
     setTimeout(() => { isScrolling = false; }, 1000);
 }
-// ทำให้ปุ่ม HTML ใช้ฟังก์ชันนี้ได้
 window.scrollToSection = scrollToSection;
 
 window.addEventListener('wheel', (e) => {
