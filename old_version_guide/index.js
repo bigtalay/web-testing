@@ -491,3 +491,98 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Helper function to convert a file into a Base64 Text String
+function convertFileToBase64(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(""); // Return empty string if no file
+            return;
+        }
+
+        // Check file size (1MB = 1,048,576 bytes)
+        if (file.size > 1048576) {
+            reject("File is too large! Please keep images under 1MB.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// Your updated Add Monster submit event
+const addMonsterForm = document.getElementById('addMonsterForm');
+if (addMonsterForm) {
+    // 1. Helper function: Converts an image file into a Base64 text string
+function convertFileToBase64(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(""); // Return empty string if no file is selected
+            return;
+        }
+
+        // Check file size (1MB limit = 1,048,576 bytes)
+        // If you upload files that are too big, it will crash the database!
+        if (file.size > 1048576) {
+            reject("ไฟล์ใหญ่เกินไป! กรุณาใช้รูปภาพขนาดไม่เกิน 1MB (File too large!)");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+// 2. The Form Submission Logic
+const addMonsterForm = document.getElementById('addMonsterForm');
+if (addMonsterForm) {
+    addMonsterForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Change button text so the user knows it is loading
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = "กำลังบันทึก... (Saving...)";
+        submitBtn.disabled = true;
+
+        try {
+            // Convert the uploaded images into text strings
+            const thumbnailBase64 = await convertFileToBase64(document.getElementById('newThumbnail'));
+            const detailImageBase64 = await convertFileToBase64(document.getElementById('newDetailImage'));
+            const weaknessChartBase64 = await convertFileToBase64(document.getElementById('newWeaknessChart'));
+
+            // Save everything to Firebase!
+            await addDoc(collection(db, "monsters"), {
+                name: document.getElementById('newName').value,
+                description: document.getElementById('newDescription').value,
+                weaknessText: document.getElementById('newWeaknessText').value,
+                thumbnail: thumbnailBase64,
+                detailImage: detailImageBase64,
+                weaknessChart: weaknessChartBase64,
+                timestamp: new Date()
+            });
+
+            // Clean up the form and refresh the screen
+            addMonsterForm.reset();
+            closeAddModal();
+            loadMonsters(); 
+            alert("เพิ่มมอนสเตอร์สำเร็จ! (Monster added!)");
+
+        } catch (error) {
+            console.error("Error: ", error);
+            alert(error); // This will pop up if the image is over 1MB
+        } finally {
+            // Reset the button back to normal
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+}
