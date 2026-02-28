@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 let monstersData = {};
-let allMonstersArray = []; // ➕ เก็บข้อมูลทั้งหมดไว้ค้นหา
+let allMonstersArray = []; 
 
 async function loadMonsters() {
     const snapshot = await getDocs(collection(db, "monsters"));
@@ -40,7 +40,6 @@ async function loadMonsters() {
         return timeA - timeB; 
     });
 
-    // ตรวจสอบว่ามีคำค้นหาค้างอยู่ไหมก่อนวาดใหม่
     const searchInput = document.getElementById('searchInput');
     if (searchInput && searchInput.value.trim() !== "") {
         handleSearch(searchInput.value);
@@ -49,7 +48,6 @@ async function loadMonsters() {
     }
 }
 
-// ➕ ฟังก์ชันใหม่สำหรับวาด Grid (แยกออกมาเพื่อให้ค้นหาแล้ววาดใหม่ได้เลย)
 function renderMonsterGrid(monstersToRender) {
     const book = document.getElementById('bookContent');
     const mainContainer = document.getElementById('mainContainer');
@@ -79,7 +77,6 @@ function renderMonsterGrid(monstersToRender) {
             newSection.classList.remove('sec2'); 
             newSection.classList.add('dynamic-page'); 
             
-            // ลบช่องค้นหาในหน้าถัดๆ ไป (ให้มีช่องค้นหาแค่หน้าแรกพอ)
             const searchBox = newSection.querySelector('.search-container');
             if (searchBox) searchBox.remove();
 
@@ -159,7 +156,6 @@ function renderMonsterGrid(monstersToRender) {
     updateNavigation();
 }
 
-// ➕ ฟังก์ชันค้นหา (พิมพ์เล็กใหญ่หาเจอหมด)
 window.handleSearch = function(searchTerm) {
     const term = searchTerm.toLowerCase().trim();
     let filtered = [];
@@ -172,7 +168,6 @@ window.handleSearch = function(searchTerm) {
         );
     }
     
-    // บังคับสไลด์ไปที่หน้าแรกของ Monster List เวลาค้นหา
     if (currentSection > 1) {
         scrollToSection(1);
     }
