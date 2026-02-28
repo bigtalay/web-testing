@@ -106,15 +106,8 @@ h2 { margin-top: 0; color: #5f4b8b; }
 .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
 .dot.active { background: white; transform: scale(1.5); }
 
-/* ปุ่มเสียง */
-.audio-container { 
-    position: absolute; 
-    bottom: 25px; 
-    left: 25px; 
-    right: auto; 
-    top: auto; 
-    z-index: 1000; 
-}
+/* ปุ่มเสียง (ย้ายมาล่างซ้ายแล้ว) */
+.audio-container { position: absolute; bottom: 25px; left: 25px; right: auto; top: auto; z-index: 1000; }
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
     padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
@@ -169,7 +162,6 @@ h2 { margin-top: 0; color: #5f4b8b; }
    📱 โค้ดสำหรับหน้าจอต่างๆ (เรียงจากใหญ่ไปเล็กเสมอ!)
    ========================================= */
 
-/* 1. สำหรับหน้าจอ iPad แนวนอน (กว้างไม่เกิน 1366px) */
 @media screen and (max-width: 1366px) {
     .monster-grid {
         grid-template-columns: repeat(5, 1fr);
@@ -177,7 +169,6 @@ h2 { margin-top: 0; color: #5f4b8b; }
     }
 }
 
-/* 2. สำหรับหน้าจอขนาดกลาง (iPad แนวตั้ง/Tablet กว้างไม่เกิน 1024px) */
 @media screen and (max-width: 1024px) {
     .monster-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -188,24 +179,19 @@ h2 { margin-top: 0; color: #5f4b8b; }
     }
 }
 
-/* 3. สำหรับหน้าจอขนาดเล็ก (Mobile/มือถือ กว้างไม่เกิน 768px) */
 @media screen and (max-width: 768px) {
     .monster-grid {
-        grid-template-columns: repeat(2, 1fr); /* บังคับเหลือ 2 คอลัมน์บนมือถือ */
+        grid-template-columns: repeat(2, 1fr); 
         gap: 10px;
         margin-top: 10px;
     }
-    
-    /* 👇 แก้ไขตัวหนังสือที่ล้นกล่อง 👇 */
     .monster-name-tag {
-        font-size: 0.9rem; /* ลดขนาดตัวอักษรลง */
-        padding: 8px 5px; /* ลดกรอบสีดำไม่ให้สูงเกินไป และเพิ่มช่องไฟซ้ายขวา */
-        word-wrap: break-word; /* ป้องกันคำยาวทะลุกรอบ */
+        font-size: 0.9rem; 
+        padding: 8px 5px; 
+        word-wrap: break-word; 
     }
-    
     .book-container { width: 95%; height: 90vh; }
     .book-content-scroll { padding: 20px; }
-    
     .monster-detail-layout { flex-direction: column; }
     .monster-image-large, .monster-info { min-width: 100%; }
     .delete-section { bottom: -40px; }
@@ -213,19 +199,17 @@ h2 { margin-top: 0; color: #5f4b8b; }
     .close-btn { top: 10px; right: 10px; }
 }
 
-/* Styling for the top-right Admin button */
+/* =========================================
+   ปุ่ม Admin (Login / Logout) ขวาบน
+   ========================================= */
 .admin-top-right-btn {
-  position: absolute; /* Change to 'fixed' if you want it to scroll with you */
+  position: absolute; 
   top: 25px;
-  right: 220px;
-  
-  /* Flexbox to align the icon and text */
+  right: 35px; /* ปรับให้ชิดขอบกำลังดี ไม่กระเด็นไปกลางจอ */
   display: flex;
   align-items: center;
   gap: 8px;
-  
-  /* Visual styling */
-  background: rgba(30, 30, 30, 0.8); /* Semi-transparent dark background */
+  background: rgba(30, 30, 30, 0.8); 
   color: #ffffff;
   border: 1px solid #444;
   padding: 10px 16px;
@@ -233,91 +217,30 @@ h2 { margin-top: 0; color: #5f4b8b; }
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  
-  /* Ensures it sits on top of background images/content */
   z-index: 100; 
-  
-  /* Smooth animation for hovering */
   transition: all 0.3s ease;
 }
 
-/* Hover Effect */
 .admin-top-right-btn:hover {
-  background: #ffcc00; /* Gold highlight */
-  color: #000000;      /* Dark text on hover */
+  background: #ffcc00; 
+  color: #000000;      
   border-color: #ffcc00;
-  transform: scale(1.05); /* Slight pop effect */
+  transform: scale(1.05); 
 }
 
-/* Make the logout button look a little different when hovered */
 .logout-variant:hover {
-  background: #e74c3c !important; /* Red background */
+  background: #e74c3c !important; 
   border-color: #e74c3c !important;
   color: white !important;
 }
 
-/* Hide Admin tools from regular users */
 body:not(.admin-logged-in) .admin-only {
   display: none !important;
 }
 
 /* =========================================
-   Hero Section & Navigation (MHW Theme Layout)
+   Hero Section กลางจอ (MHW Theme Layout)
    ========================================= */
-
-.sec1 {
-    justify-content: flex-start;
-}
-
-.top-nav {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-    box-sizing: border-box;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-    z-index: 10;
-}
-
-.nav-brand {
-    color: #e3c16f;
-    font-size: 2rem;
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    text-transform: uppercase;
-}
-
-.nav-links {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: color 0.3s;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-    text-transform: uppercase;
-}
-
-.nav-links a:hover {
-    color: #e3c16f;
-}
-
-/* Safely override absolute positioning for your existing admin buttons so they sit cleanly in the nav */
-.nav-actions {
-    display: flex;
-    gap: 10px;
-}
-.nav-actions .admin-top-right-btn {
-    position: relative;
-    top: auto;
-    right: auto;
-}
 
 .hero-content {
     display: flex;
@@ -328,7 +251,7 @@ body:not(.admin-logged-in) .admin-only {
     text-align: center;
     z-index: 2;
     padding: 0 20px;
-    margin-top: -80px; 
+    margin-top: 0; /* กลับมาจัดกึ่งกลางปกติ */
 }
 
 .hero-title {
@@ -356,8 +279,7 @@ body:not(.admin-logged-in) .admin-only {
     gap: 20px;
 }
 
-/* Themed buttons to match your existing game aesthetics */
-.primary-btn, .secondary-btn {
+.primary-btn {
     padding: 15px 35px;
     font-size: 1.2rem;
     font-weight: bold;
@@ -365,9 +287,6 @@ body:not(.admin-logged-in) .admin-only {
     transition: all 0.3s ease;
     text-transform: uppercase;
     clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-}
-
-.primary-btn {
     background: #e3c16f;
     color: #2b2b2b;
     border: 2px solid #e3c16f;
@@ -381,39 +300,11 @@ body:not(.admin-logged-in) .admin-only {
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6);
 }
 
-.secondary-btn {
-    background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%);
-    color: #e3c16f;
-    border: 2px solid #e3c16f;
-}
-
-.secondary-btn:hover {
-    background: #e3c16f;
-    color: #2b2b2b;
-    transform: translateY(-3px);
-}
-
-/* Mobile adjustments */
 @media screen and (max-width: 768px) {
-    .top-nav {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-    }
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
-    }
     .hero-title {
         font-size: 3rem;
     }
     .hero-subtitle {
         font-size: 1rem;
-    }
-    .hero-buttons {
-        flex-direction: column;
-        width: 100%;
-        max-width: 300px;
     }
 }

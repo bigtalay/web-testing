@@ -188,7 +188,7 @@ function scrollToSection(index) {
     if(allDots[currentSection]) allDots[currentSection].classList.add('active');
     isScrolling = true;
     setTimeout(() => { isScrolling = false; }, 1000);
-}
+}window.scrollToSection = scrollToSection;
 
 window.addEventListener('wheel', (e) => {
     if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;

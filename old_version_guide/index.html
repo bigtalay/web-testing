@@ -8,6 +8,7 @@
   </head>
   <body>
     <div class="main-container" id="mainContainer">
+      
       <div class="audio-container">
         <div id="youtube-player"></div>
         <button onclick="toggleMute()" id="muteBtn" class="game-button">
@@ -16,45 +17,32 @@
       </div>
 
       <div class="section sec1 active">
-        <nav class="top-nav">
-          <div class="nav-brand">MH GUILD</div>
-          <div class="nav-links">
-            <a href="#">Quest Board</a>
-            <a href="#">ยิง SOS</a>
-            <a href="#">แชท</a>
-            <a href="#">Guild Card</a>
-          </div>
-          
-          <div class="nav-actions">
-            <button id="btn-login" class="admin-top-right-btn" onclick="openLoginModal()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                <polyline points="10 17 15 12 10 7"></polyline>
-                <line x1="15" y1="12" x2="3" y2="12"></line>
-              </svg>
-              Login
-            </button>
+        
+        <button id="btn-login" class="admin-top-right-btn" onclick="openLoginModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          Login
+        </button>
 
-            <button id="btn-logout" class="admin-top-right-btn logout-variant" onclick="logoutAdmin()" style="display: none">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              Logout
-            </button>
-          </div>
-        </nav>
+        <button id="btn-logout" class="admin-top-right-btn logout-variant" onclick="logoutAdmin()" style="display: none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
+        </button>
 
         <div class="hero-content">
           <h1 class="hero-title">WELCOME HUNTER</h1>
           <p class="hero-subtitle">
-            หาปาร์ตี้ล่ามอนสเตอร์, ขอความช่วยเหลือ, หรือหาเพื่อนเดินเล่น<br>
-            ใน Guiding Lands ได้ที่นี่ แพลตฟอร์มสำหรับฮันเตอร์ทุกคน
+            รวบรวมเนื้อหาข้อมูลมอนสเตอร์ เพื่อให้มือใหม่และมือฉมังมาเปิดดูวิธีสู้และจุดอ่อน
           </p>
           <div class="hero-buttons">
-            <button class="primary-btn" onclick="scrollToSection(1)">เข้าร่วมเควสต์ (QUEST BOARD)</button>
-            <button class="secondary-btn">ยิง SOS FLARE</button>
+            <button class="primary-btn" onclick="scrollToSection(1)">ดูรายชื่อมอนสเตอร์ (MONSTER LIST)</button>
           </div>
         </div>
 
@@ -90,56 +78,27 @@
           <form id="addMonsterForm" class="monster-form">
             <div class="input-group">
               <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input
-                type="text"
-                id="newName"
-                placeholder="เช่น Great Jagras"
-                required
-              />
+              <input type="text" id="newName" placeholder="เช่น Great Jagras" required />
             </div>
             <div class="input-group">
               <label>2. รูปปก Icon (URL):</label>
-              <input
-                type="url"
-                id="newThumbnail"
-                placeholder="ลิ้งก์รูปภาพสี่เหลี่ยมจัตุรัส"
-                required
-              />
+              <input type="url" id="newThumbnail" placeholder="ลิ้งก์รูปภาพสี่เหลี่ยมจัตุรัส" required />
             </div>
             <div class="input-group">
               <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
-              <input
-                type="url"
-                id="newDetailImage"
-                placeholder="ลิ้งก์รูปมอนสเตอร์ตัวเต็ม"
-                required
-              />
+              <input type="url" id="newDetailImage" placeholder="ลิ้งก์รูปมอนสเตอร์ตัวเต็ม" required />
             </div>
             <div class="input-group">
               <label>4. รายละเอียด (General Info):</label>
-              <textarea
-                id="newDescription"
-                rows="4"
-                placeholder="ข้อมูลทั่วไปของมอนสเตอร์..."
-                required
-              ></textarea>
+              <textarea id="newDescription" rows="4" placeholder="ข้อมูลทั่วไปของมอนสเตอร์..." required></textarea>
             </div>
             <div class="input-group">
               <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <input
-                type="text"
-                id="newWeaknessText"
-                placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️"
-                required
-              />
+              <input type="text" id="newWeaknessText" placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️" required />
             </div>
             <div class="input-group">
               <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
-              <input
-                type="url"
-                id="newWeaknessChart"
-                placeholder="ลิ้งก์รูปตารางจุดอ่อน"
-              />
+              <input type="url" id="newWeaknessChart" placeholder="ลิ้งก์รูปตารางจุดอ่อน" />
             </div>
             <button type="submit" class="game-button submit-btn">
               บันทึกข้อมูลมอนสเตอร์
@@ -182,11 +141,7 @@
               <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
               <input type="url" id="editWeaknessChart" />
             </div>
-            <button
-              type="submit"
-              class="game-button submit-btn"
-              style="border-color: #1565c0; color: #1565c0"
-            >
+            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">
               บันทึกการแก้ไข
             </button>
           </form>
@@ -200,85 +155,26 @@
       <div class="dot" onclick="scrollToSection(2)"></div>
     </div>
 
-    <div
-      id="login-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <div
-        style="
-          background: #2a2a2a;
-          padding: 30px;
-          border-radius: 10px;
-          border: 1px solid #444;
-          width: 300px;
-        "
-      >
+    <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; justify-content: center; align-items: center;">
+      <div style="background: #2a2a2a; padding: 30px; border-radius: 10px; border: 1px solid #444; width: 300px;">
         <h2 style="color: white; margin-top: 0; text-align: center">
           Admin Login
         </h2>
-
-        <form
-          id="admin-login-form"
-          style="display: flex; flex-direction: column; gap: 15px"
-        >
-          <input
-            type="text"
-            placeholder="Username"
-            required
-            style="padding: 10px; border-radius: 5px; border: none"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            style="padding: 10px; border-radius: 5px; border: none"
-          />
-
+        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 15px">
+          <input type="text" placeholder="Username" required style="padding: 10px; border-radius: 5px; border: none" />
+          <input type="password" placeholder="Password" required style="padding: 10px; border-radius: 5px; border: none" />
           <div style="display: flex; gap: 10px">
-            <button
-              type="submit"
-              style="
-                flex: 1;
-                padding: 10px;
-                background: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-              "
-            >
+            <button type="submit" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
               Login
             </button>
-            <button
-              type="button"
-              onclick="closeLoginModal()"
-              style="
-                flex: 1;
-                padding: 10px;
-                background: #e74c3c;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-              "
-            >
+            <button type="button" onclick="closeLoginModal()" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
               Cancel
             </button>
           </div>
         </form>
       </div>
     </div>
+
     <script type="module" src="index.js"></script>
   </body>
 </html>
