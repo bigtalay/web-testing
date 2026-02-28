@@ -448,3 +448,121 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFeaturedMonsters();
   updateMusicUI();
 });
+
+function openLoginModal() {
+    // Show the popup
+    document.getElementById('login-modal').style.display = 'flex';
+    
+    // Update active class in nav
+    updateActiveNav('nav-admin');
+}
+
+function closeLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+}
+
+function updateActiveNav(activeId) {
+    // Remove 'active' class from all nav links
+    const navLinks = document.querySelectorAll('#desktop-nav a');
+    navLinks.forEach(link => link.classList.remove('active'));
+    
+    // Add 'active' class to the clicked link
+    document.getElementById(activeId).classList.add('active');
+}
+
+// Ensure your existing navigate function also calls updateActiveNav
+// Example: 
+// function navigate(page) { 
+//    updateActiveNav('nav-' + page); 
+//    ... existing logic ...
+// }
+
+// Add this to your script section
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('admin-login-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Stops the page from reloading
+
+    // Get values from the inputs
+    const user = this.querySelector('input[type="text"]').value;
+    const pass = this.querySelector('input[type="password"]').value;
+
+    // BASIC HARDCODED CHECK (Replace with your desired credentials)
+    const ADMIN_USER = "root";
+    const ADMIN_PASS = "root"; 
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        alert("Login Successful! Welcome, Master.");
+        
+        // 1. Hide the modal
+        closeLoginModal();
+        
+        // 2. Logic for 'logged in' state
+        handleSuccessfulLogin();
+        
+        // 3. Clear the form for next time
+        this.reset();
+    } else {
+        alert("Invalid credentials. Access denied.");
+        this.querySelector('input[type="password"]').value = ""; // Clear password only
+    }
+});
+
+// 1. Show panel on successful login
+function handleSuccessfulLogin() {
+    document.getElementById('admin-panel').style.display = 'block';
+    navigate('monsters'); // Automatically take user to the list to edit
+}
+
+// 2. Handle Form Submission (Add or Edit)
+document.getElementById('monster-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('monster-id').value;
+    const monsterData = {
+        name: document.getElementById('m-name').value,
+        type: document.getElementById('m-type').value,
+        desc: document.getElementById('m-desc').value,
+        hp: document.getElementById('m-hp').value
+    };
+
+    if (id) {
+        console.log("Updating monster ID:", id, monsterData);
+        alert(`${monsterData.name} updated successfully!`);
+    } else {
+        console.log("Adding new monster:", monsterData);
+        alert(`${monsterData.name} added to the Bestiary!`);
+    }
+
+    resetMonsterForm();
+    // Here you would normally call a function to refresh your monster list UI
+});
+
+// 3. Edit Function (Call this from your Monster List)
+function startEditMonster(id, name, type, desc, hp) {
+    document.getElementById('admin-title').innerText = "Edit Monster: " + name;
+    document.getElementById('save-btn').innerText = "Update Monster";
+    
+    // Fill the form
+    document.getElementById('monster-id').value = id;
+    document.getElementById('m-name').value = name;
+    document.getElementById('m-type').value = type;
+    document.getElementById('m-desc').value = desc;
+    document.getElementById('m-hp').value = hp;
+    
+    // Scroll to top so user sees the form
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function resetMonsterForm() {
+    document.getElementById('monster-form').reset();
+    document.getElementById('monster-id').value = "";
+    document.getElementById('admin-title').innerText = "Add New Monster";
+    document.getElementById('save-btn').innerText = "Save Monster";
+}
+
+});
+
+function logoutAdmin() {
+    document.getElementById('admin-panel').style.display = 'none';
+    alert("Logged out.");
+}
