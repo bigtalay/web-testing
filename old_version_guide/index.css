@@ -37,7 +37,7 @@ body, html {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.3);
 }
 
-.sec1 .scroll-down, .sec1 h1, .sec1 .monster-grid { position: relative; z-index: 2; }
+.sec1 .monster-grid { position: relative; z-index: 2; }
 .monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 20px; }
 
 /* Grid การ์ดมอนสเตอร์ */
@@ -98,114 +98,20 @@ body, html {
 h2 { margin-top: 0; color: #5f4b8b; }
 .weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
-/* Scroll Down & Dots */
-.scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; animation: bounce 2s infinite; cursor: pointer; }
-.arrow { width: 20px; height: 20px; border-bottom: 4px solid white; border-right: 4px solid white; transform: rotate(45deg); }
-@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-20px);} }
-.nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 10; }
-.dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-.dot.active { background: white; transform: scale(1.5); }
-
-/* ปุ่มเสียง (ย้ายมาล่างซ้ายแล้ว) */
-.audio-container { position: absolute; bottom: 25px; left: 25px; right: auto; top: auto; z-index: 1000; }
+/* ปุ่มเสียง ล่างซ้าย */
+.audio-container { position: absolute; bottom: 25px; left: 25px; z-index: 1000; }
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
     padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
 }
 .game-button:hover { background: #e3c16f; color: #2b2b2b; box-shadow: 0 0 20px rgba(227, 193, 111, 0.8); }
-#youtube-player { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: -100; }
 
-/* ปุ่มเพิ่มมอนสเตอร์ */
-.add-monster-card { background-color: #444; display: flex; justify-content: center; align-items: center; border: 3px dashed #777; transition: all 0.3s; }
-.add-monster-card:hover { transform: scale(1.05) translateY(-10px); background-color: #555; border-color: #e3c16f; box-shadow: 0 10px 20px rgba(227, 193, 111, 0.3); }
-.add-icon { font-size: 3rem; color: #888; transition: color 0.3s; }
-.add-monster-card:hover .add-icon { color: #e3c16f; }
-
-/* ฟอร์ม */
-.add-form-container { max-width: 600px; }
-.monster-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-.input-group { display: flex; flex-direction: column; gap: 5px; }
-.input-group label { font-weight: bold; color: #3e2723; font-size: 1.1rem; }
-.input-group input, .input-group textarea { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
-.input-group input:focus, .input-group textarea:focus { outline: none; border-color: #5f4b8b; }
-.submit-btn { margin-top: 20px; padding: 15px; font-size: 1.2rem; text-align: center; width: 100%; }
-
-/* --- 🗑️ & ✏️ กลุ่มปุ่มลบและแก้ไขมอนสเตอร์ --- */
-.delete-section {
-    position: absolute; bottom: -50px; left: 0px; z-index: 105;
-    display: flex; gap: 15px; align-items: center;
-}
-.delete-btn { background: none; border: none; cursor: pointer; color: #3e2723; padding: 5px; transition: transform 0.2s, color 0.2s; }
-.delete-btn:hover { transform: scale(1.1); color: #d32f2f; }
-.edit-btn { background: none; border: none; cursor: pointer; color: #3e2723; padding: 5px; transition: transform 0.2s, color 0.2s; }
-.edit-btn:hover { transform: scale(1.1); color: #1565c0; }
-
-/* กล่องยืนยันการลบ */
-.delete-confirm {
-    position: absolute; bottom: 55px; left: 0px;
-    background-image: url('cknepx23usg41.jpg'); background-size: cover; background-position: center;
-    border: 2px solid #000; display: none; width: 220px; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-.delete-confirm.show-confirm { display: flex; flex-direction: column; }
-.confirm-text { padding: 15px 10px; text-align: center; font-size: 1.2rem; font-weight: bold; color: #000; border-bottom: 2px solid #000; background: rgba(255, 255, 255, 0.4); }
-.confirm-actions { display: flex; height: 45px; }
-.confirm-actions button {
-    flex: 1; padding: 0; border: none; background: transparent; cursor: pointer;
-    font-size: 1.2rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #000; transition: background 0.2s;
-}
-.btn-yes { border-right: 2px solid #000 !important; }
-.btn-yes:hover { background: rgba(255, 0, 0, 0.2); }
-.btn-no:hover { background: rgba(0, 0, 0, 0.1); }
-
-/* =========================================
-   📱 โค้ดสำหรับหน้าจอต่างๆ (เรียงจากใหญ่ไปเล็กเสมอ!)
-   ========================================= */
-
-@media screen and (max-width: 1366px) {
-    .monster-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 12px;
-    }
-}
-
-@media screen and (max-width: 1024px) {
-    .monster-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-    }
-    .youtube-bg iframe {
-        transform: translate(-50%, -50%) scale(1.8);
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .monster-grid {
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 10px;
-        margin-top: 10px;
-    }
-    .monster-name-tag {
-        font-size: 0.9rem; 
-        padding: 8px 5px; 
-        word-wrap: break-word; 
-    }
-    .book-container { width: 95%; height: 90vh; }
-    .book-content-scroll { padding: 20px; }
-    .monster-detail-layout { flex-direction: column; }
-    .monster-image-large, .monster-info { min-width: 100%; }
-    .delete-section { bottom: -40px; }
-    .nav-dots { right: 10px; }
-    .close-btn { top: 10px; right: 10px; }
-}
-
-/* =========================================
-   ปุ่ม Admin (Login / Logout) ขวาบน
-   ========================================= */
+/* ปุ่ม Admin (Login / Logout) ขวาบน */
 .admin-top-right-btn {
   position: absolute; 
   top: 25px;
-  right: 35px; /* ปรับให้ชิดขอบกำลังดี ไม่กระเด็นไปกลางจอ */
+  right: 25px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -247,11 +153,9 @@ body:not(.admin-logged-in) .admin-only {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-grow: 1;
     text-align: center;
     z-index: 2;
     padding: 0 20px;
-    margin-top: 0; /* กลับมาจัดกึ่งกลางปกติ */
 }
 
 .hero-title {
@@ -300,11 +204,85 @@ body:not(.admin-logged-in) .admin-only {
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6);
 }
 
+/* Scroll Down & Dots ตรงกลางเป๊ะๆ */
+.scroll-down { 
+    position: absolute; 
+    bottom: 25px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    z-index: 10; 
+    animation: bounce 2s infinite; 
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.scroll-text {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+    letter-spacing: 1px;
+}
+
+.arrow { 
+    width: 18px; 
+    height: 18px; 
+    border-bottom: 4px solid white; 
+    border-right: 4px solid white; 
+    transform: rotate(45deg); 
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+}
+
+@keyframes bounce { 
+    0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 
+    40% {transform: translateX(-50%) translateY(-15px);} 
+}
+
+.nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 10; }
+.dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+.dot.active { background: white; transform: scale(1.5); }
+
+/* ปุ่มเพิ่มมอนสเตอร์ และฟอร์มต่างๆ */
+.add-monster-card { background-color: #444; display: flex; justify-content: center; align-items: center; border: 3px dashed #777; transition: all 0.3s; }
+.add-monster-card:hover { transform: scale(1.05) translateY(-10px); background-color: #555; border-color: #e3c16f; box-shadow: 0 10px 20px rgba(227, 193, 111, 0.3); }
+.add-icon { font-size: 3rem; color: #888; transition: color 0.3s; }
+.add-monster-card:hover .add-icon { color: #e3c16f; }
+.add-form-container { max-width: 600px; }
+.monster-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.input-group { display: flex; flex-direction: column; gap: 5px; }
+.input-group label { font-weight: bold; color: #3e2723; font-size: 1.1rem; }
+.input-group input, .input-group textarea { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
+.input-group input:focus, .input-group textarea:focus { outline: none; border-color: #5f4b8b; }
+.submit-btn { margin-top: 20px; padding: 15px; font-size: 1.2rem; text-align: center; width: 100%; }
+.delete-section { position: absolute; bottom: -50px; left: 0px; z-index: 105; display: flex; gap: 15px; align-items: center; }
+.delete-btn, .edit-btn { background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s, color 0.2s; }
+.delete-btn { color: #3e2723; } .delete-btn:hover { transform: scale(1.1); color: #d32f2f; }
+.edit-btn { color: #3e2723; } .edit-btn:hover { transform: scale(1.1); color: #1565c0; }
+.delete-confirm { position: absolute; bottom: 55px; left: 0px; background-image: url('cknepx23usg41.jpg'); background-size: cover; background-position: center; border: 2px solid #000; display: none; width: 220px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+.delete-confirm.show-confirm { display: flex; flex-direction: column; }
+.confirm-text { padding: 15px 10px; text-align: center; font-size: 1.2rem; font-weight: bold; color: #000; border-bottom: 2px solid #000; background: rgba(255, 255, 255, 0.4); }
+.confirm-actions { display: flex; height: 45px; }
+.confirm-actions button { flex: 1; padding: 0; border: none; background: transparent; cursor: pointer; font-size: 1.2rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; color: #000; transition: background 0.2s; }
+.btn-yes { border-right: 2px solid #000 !important; }
+.btn-yes:hover { background: rgba(255, 0, 0, 0.2); }
+.btn-no:hover { background: rgba(0, 0, 0, 0.1); }
+
+/* Mobile Adjustments */
+@media screen and (max-width: 1366px) { .monster-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; } }
+@media screen and (max-width: 1024px) { .monster-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; } .youtube-bg iframe { transform: translate(-50%, -50%) scale(1.8); } }
 @media screen and (max-width: 768px) {
-    .hero-title {
-        font-size: 3rem;
-    }
-    .hero-subtitle {
-        font-size: 1rem;
-    }
+    .hero-title { font-size: 3rem; }
+    .hero-subtitle { font-size: 1rem; }
+    .monster-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+    .monster-name-tag { font-size: 0.9rem; padding: 8px 5px; word-wrap: break-word; }
+    .book-container { width: 95%; height: 90vh; }
+    .book-content-scroll { padding: 20px; }
+    .monster-detail-layout { flex-direction: column; }
+    .monster-image-large, .monster-info { min-width: 100%; }
+    .delete-section { bottom: -40px; }
+    .nav-dots { right: 10px; }
+    .close-btn { top: 10px; right: 10px; }
 }
