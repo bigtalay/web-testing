@@ -8,7 +8,6 @@ const modal = document.getElementById('monsterModal');
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 1. Setup Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyD3jwOwv5FHHi_IM3nVPQNQC6ayPnuylEA",
   authDomain: "forwebtesting-12636.firebaseapp.com",
@@ -21,48 +20,53 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// เก็บข้อมูลชั่วคราวสำหรับใช้งานตอนกด Edit
 let monstersData = {};
+let allMonstersArray = []; // ➕ เก็บข้อมูลทั้งหมดไว้ค้นหา
 
-// 2. The Logic Loop
 async function loadMonsters() {
-    const book = document.getElementById('bookContent');
-    const mainContainer = document.getElementById('mainContainer');
-    const sec2 = document.querySelector('.sec2'); 
-    const sec3 = document.querySelector('.sec3'); 
-
-    book.innerHTML = '';
-    monstersData = {}; 
-
     const snapshot = await getDocs(collection(db, "monsters"));
-    let monstersArray = [];
+    allMonstersArray = [];
+    monstersData = {}; 
 
     snapshot.forEach((doc) => {
         const m = doc.data();
-        monstersData[doc.id] = m; // เซฟลง Dictionary
-        monstersArray.push({ type: 'monster', id: doc.id, data: m });
+        monstersData[doc.id] = m;
+        allMonstersArray.push({ type: 'monster', id: doc.id, data: m });
     });
 
-    // เรียงลำดับจากเก่าไปใหม่
-    monstersArray.sort((a, b) => {
+    allMonstersArray.sort((a, b) => {
         const timeA = a.data.createdAt || 0; 
         const timeB = b.data.createdAt || 0;
         return timeA - timeB; 
     });
 
-    let allItems = [...monstersArray];
+    // ตรวจสอบว่ามีคำค้นหาค้างอยู่ไหมก่อนวาดใหม่
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim() !== "") {
+        handleSearch(searchInput.value);
+    } else {
+        renderMonsterGrid(allMonstersArray);
+    }
+}
 
-    // ปุ่ม + อยู่ท้ายสุด
+// ➕ ฟังก์ชันใหม่สำหรับวาด Grid (แยกออกมาเพื่อให้ค้นหาแล้ววาดใหม่ได้เลย)
+function renderMonsterGrid(monstersToRender) {
+    const book = document.getElementById('bookContent');
+    const mainContainer = document.getElementById('mainContainer');
+    const sec2 = document.querySelector('.sec2'); 
+    const sec3 = document.querySelector('.sec3'); 
+
+    document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
+    book.innerHTML = ''; 
+
+    let allItems = [...monstersToRender];
     allItems.push({ type: 'add_button', id: 'add-btn-unique' });
 
-    // แบ่งหน้า 12 ตัวต่อหน้า
     const itemsPerPage = 12;
     const pages = [];
     for (let i = 0; i < allItems.length; i += itemsPerPage) {
         pages.push(allItems.slice(i, i + itemsPerPage));
     }
-
-    document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
 
     pages.forEach((pageItems, pageIndex) => {
         let targetGrid;
@@ -74,6 +78,11 @@ async function loadMonsters() {
             const newSection = sec2.cloneNode(true);
             newSection.classList.remove('sec2'); 
             newSection.classList.add('dynamic-page'); 
+            
+            // ลบช่องค้นหาในหน้าถัดๆ ไป (ให้มีช่องค้นหาแค่หน้าแรกพอ)
+            const searchBox = newSection.querySelector('.search-container');
+            if (searchBox) searchBox.remove();
+
             const title = newSection.querySelector('.monster-list-title');
             if(title) title.innerText = `Monster List (Page ${pageIndex + 1})`;
             targetGrid = newSection.querySelector('.monster-grid');
@@ -83,9 +92,8 @@ async function loadMonsters() {
 
         pageItems.forEach(item => {
             if (item.type === 'add_button') {
-                // It should look exactly like this:
-const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
-    targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
+                const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
+                targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
             } else {
                 const m = item.data;
                 const id = item.id;
@@ -104,10 +112,8 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
                 if (!document.getElementById(`content-${id}`)) {
                     const pageHTML = `
                         <div id="content-${id}" class="monster-detail-layout" style="display: none;">
-                            
                             <div class="monster-image-large">
                                 <img src="${m.detailImage}" alt="${m.name}" />
-
                                 <div class="delete-section admin-only">
                                     <div class="delete-confirm" id="confirm-${id}">
                                         <div class="confirm-text">แน่ใจไหมว่าจะลบ</div>
@@ -116,7 +122,6 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
                                             <button class="btn-no" onclick="toggleDeleteConfirm('${id}')">ไม่</button>
                                         </div>
                                     </div>
-                                    
                                     <button class="delete-btn" onclick="toggleDeleteConfirm('${id}')" title="ลบมอนสเตอร์">
                                         <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -125,7 +130,6 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
                                             <line x1="14" y1="11" x2="14" y2="17"></line>
                                         </svg>
                                     </button>
-
                                     <button class="edit-btn" onclick="openEditModal('${id}')" title="แก้ไขข้อมูล">
                                         <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -133,7 +137,6 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
                                     </button>
                                 </div>
                             </div>
-                            
                             <div class="monster-info">
                                 <h2>${m.name}</h2>
                                 <div class="info-section">
@@ -146,7 +149,6 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
                                     ${m.weaknessChart ? `<img src="${m.weaknessChart}" class="weakness-img">` : ''}
                                 </div>
                             </div>
-
                         </div>
                     `;
                     book.insertAdjacentHTML('beforeend', pageHTML);
@@ -154,27 +156,47 @@ const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddMo
             }
         });
     });
-
     updateNavigation();
+}
+
+// ➕ ฟังก์ชันค้นหา (พิมพ์เล็กใหญ่หาเจอหมด)
+window.handleSearch = function(searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+    let filtered = [];
+    
+    if (term === "") {
+        filtered = allMonstersArray;
+    } else {
+        filtered = allMonstersArray.filter(item => 
+            item.data.name.toLowerCase().includes(term)
+        );
+    }
+    
+    // บังคับสไลด์ไปที่หน้าแรกของ Monster List เวลาค้นหา
+    if (currentSection > 1) {
+        scrollToSection(1);
+    }
+    
+    renderMonsterGrid(filtered);
 }
 
 function updateNavigation() {
     sections = document.querySelectorAll('.section'); 
     totalSections = sections.length;
     const dotContainer = document.querySelector('.nav-dots');
-    dotContainer.innerHTML = ''; 
-
-    sections.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (index === currentSection) dot.classList.add('active');
-        dot.addEventListener('click', () => scrollToSection(index));
-        dotContainer.appendChild(dot);
-    });
+    if(dotContainer) {
+        dotContainer.innerHTML = ''; 
+        sections.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === currentSection) dot.classList.add('active');
+            dot.addEventListener('click', () => scrollToSection(index));
+            dotContainer.appendChild(dot);
+        });
+    }
 }
 
 loadMonsters(); 
-
 
 // --- ระบบ Scroll ---
 function scrollToSection(index) {
@@ -189,6 +211,7 @@ function scrollToSection(index) {
     isScrolling = true;
     setTimeout(() => { isScrolling = false; }, 1000);
 }
+window.scrollToSection = scrollToSection;
 
 window.addEventListener('wheel', (e) => {
     if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
@@ -222,7 +245,6 @@ modal.addEventListener('click', (e) => {
 });
 window.closeModal = closeModal;
 
-// --- ➕ เพิ่มมอนสเตอร์ ---
 window.openAddModal = function() { document.getElementById('addMonsterModal').classList.add('show'); }
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
 document.getElementById('addMonsterModal').addEventListener('click', (e) => {
@@ -252,7 +274,6 @@ document.getElementById('addMonsterForm').addEventListener('submit', async (e) =
     finally { btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; btn.disabled = false; }
 });
 
-// --- ✏️ แก้ไขมอนสเตอร์ ---
 window.openEditModal = function(id) {
     const m = monstersData[id];
     if (m) {
@@ -294,7 +315,6 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
     finally { btn.innerHTML = "บันทึกการแก้ไข"; btn.disabled = false; }
 });
 
-// --- 🗑️ ลบมอนสเตอร์ ---
 window.toggleDeleteConfirm = function(id) {
     const confirmBox = document.getElementById(`confirm-${id}`);
     if (confirmBox) confirmBox.classList.toggle('show-confirm');
@@ -307,7 +327,6 @@ window.deleteMonster = async function(id) {
     } catch (error) { alert("❌ เกิดข้อผิดพลาดในการลบ"); }
 }
 
-// --- 🎵 เสียง YouTube ---
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -340,23 +359,17 @@ window.toggleMute = function() {
     else { player.mute(); btn.innerHTML = "🔇 Unmute Music"; isMuted = true; }
 }
 
-
-// --- ระบบ Touch สำหรับมือถือและไอแพด (Swipe) ---
 let touchStartY = 0;
 let touchEndY = 0;
 
-// 1. Block native mobile scrolling (Pull-to-refresh) so our custom swipe works
 window.addEventListener('touchmove', e => {
-    // If a modal is open, let the user scroll normally inside the modal
     if (modal.classList.contains('show') || 
         document.getElementById('addMonsterModal').classList.contains('show') || 
         document.getElementById('editMonsterModal').classList.contains('show')) {
         return; 
     }
-    
-    // Otherwise, block the default browser scrolling
     e.preventDefault(); 
-}, { passive: false }); // passive: false is REQUIRED for preventDefault() to work on touch events
+}, { passive: false }); 
 
 window.addEventListener('touchstart', e => {
     touchStartY = e.changedTouches[0].screenY;
@@ -374,58 +387,13 @@ window.addEventListener('touchend', e => {
 });
 
 function handleSwipe() {
-    const swipeThreshold = 50; // ต้องปัดนิ้วอย่างน้อย 50px ระบบถึงจะทำงาน
-    
+    const swipeThreshold = 50; 
     if (touchStartY - touchEndY > swipeThreshold) {
-        // ปัดขึ้น -> ไปหน้าถัดไป (Swipe Up)
         scrollToSection(currentSection + 1);
     } else if (touchEndY - touchStartY > swipeThreshold) {
-        // ปัดลง -> กลับหน้าก่อนหน้า (Swipe Down)
         scrollToSection(currentSection - 1);
     }
 }
-
-// ==========================================
-// 1. FUNCTIONS TRIGGERED BY HTML BUTTONS
-// (These must stay outside the DOMContentLoaded block)
-// ==========================================
-
-function openLoginModal() {
-    const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = 'flex';
-}
-
-function closeLoginModal() {
-    const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = 'none';
-}
-
-function handleSuccessfulLogin() {
-    // 1. Show the Admin Panel
-    const panel = document.getElementById('admin-panel');
-    if (panel) panel.style.display = 'block';
-
-    // 2. Hide the top-right Admin button so it's out of the way
-    const adminBtn = document.querySelector('.admin-top-right-btn');
-    if (adminBtn) adminBtn.style.display = 'none';
-}
-
-function logoutAdmin() {
-    // 1. Hide the Admin Panel
-    const panel = document.getElementById('admin-panel');
-    if (panel) panel.style.display = 'none';
-
-    // 2. Bring back the top-right Admin button
-    const adminBtn = document.querySelector('.admin-top-right-btn');
-    if (adminBtn) adminBtn.style.display = 'flex'; // We used flex in the CSS!
-
-    alert("Logged out successfully.");
-}
-
-// ==========================================
-// 1. FUNCTIONS TRIGGERED BY HTML BUTTONS
-// (Attached to 'window' so HTML can see them inside a Module)
-// ==========================================
 
 window.openLoginModal = function() {
     const modal = document.getElementById('login-modal');
@@ -438,45 +406,25 @@ window.closeLoginModal = function() {
 }
 
 window.handleSuccessfulLogin = function() {
-    const panel = document.getElementById('admin-panel');
-    if (panel) panel.style.display = 'block';
-
-    // Swap buttons
     document.getElementById('btn-login').style.display = 'none';
     document.getElementById('btn-logout').style.display = 'flex'; 
-    
-    // THIS MUST BE "ADD" (It turns the tools ON)
     document.body.classList.add('admin-logged-in');
-    
     window.isAdminLoggedIn = true; 
 }
 
 window.logoutAdmin = function() {
-    const panel = document.getElementById('admin-panel');
-    if (panel) panel.style.display = 'none';
-
-    // Swap buttons back
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('btn-login').style.display = 'flex'; 
-    
-    // THIS MUST BE "REMOVE" (It turns the tools OFF)
     document.body.classList.remove('admin-logged-in');
-    
     window.isAdminLoggedIn = false;
     alert("Logged out successfully.");
 }
-// ==========================================
-// 2. FORM SUBMISSION LOGIC
-// ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    
     const loginForm = document.getElementById('admin-login-form');
-    
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault(); 
-            
             const user = this.querySelector('input[type="text"]').value;
             const pass = this.querySelector('input[type="password"]').value;
 
