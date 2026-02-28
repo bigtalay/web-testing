@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MH Monster Guide</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="main-container" id="mainContainer">
+      <div class="audio-container">
+        <div id="youtube-player"></div>
+        <button onclick="toggleMute()" id="muteBtn" class="game-button">
+          🔊 Mute Music
+        </button>
+      </div>
+
+      <div class="section sec1 active">
+        <div class="scroll-down" onclick="scrollToSection(1)">
+          <div class="arrow"></div>
+        </div>
+      </div>
+
+      <div class="section sec2">
+        <h1 class="monster-list-title">Monster List</h1>
+        <div class="monster-grid" id="monsterGrid"></div>
+      </div>
+
+      <div class="section sec3">
+        <h1 style="color: white; z-index: 2">More to come...</h1>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="monsterModal">
+      <div class="book-container">
+        <div class="close-btn" onclick="closeModal()">&times;</div>
+        <div class="book-content-scroll" id="bookContent"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="addMonsterModal">
+      <div class="book-container add-form-container">
+        <div class="close-btn" onclick="closeAddModal()">&times;</div>
+        <div class="book-content-scroll">
+          <h2 style="text-align: center; color: #5f4b8b">
+            + เพิ่มมอนสเตอร์ใหม่
+          </h2>
+          <form id="addMonsterForm" class="monster-form">
+            <div class="input-group">
+              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
+              <input
+                type="text"
+                id="newName"
+                placeholder="เช่น Great Jagras"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label>2. รูปปก Icon (URL):</label>
+              <input
+                type="url"
+                id="newThumbnail"
+                placeholder="ลิ้งก์รูปภาพสี่เหลี่ยมจัตุรัส"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
+              <input
+                type="url"
+                id="newDetailImage"
+                placeholder="ลิ้งก์รูปมอนสเตอร์ตัวเต็ม"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label>4. รายละเอียด (General Info):</label>
+              <textarea
+                id="newDescription"
+                rows="4"
+                placeholder="ข้อมูลทั่วไปของมอนสเตอร์..."
+                required
+              ></textarea>
+            </div>
+            <div class="input-group">
+              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
+              <input
+                type="text"
+                id="newWeaknessText"
+                placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
+              <input
+                type="url"
+                id="newWeaknessChart"
+                placeholder="ลิ้งก์รูปตารางจุดอ่อน"
+              />
+            </div>
+            <button type="submit" class="game-button submit-btn">
+              บันทึกข้อมูลมอนสเตอร์
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="editMonsterModal">
+      <div class="book-container add-form-container">
+        <div class="close-btn" onclick="closeEditModal()">&times;</div>
+        <div class="book-content-scroll">
+          <h2 style="text-align: center; color: #1565c0">
+            📝 แก้ไขข้อมูลมอนสเตอร์
+          </h2>
+          <form id="editMonsterForm" class="monster-form">
+            <input type="hidden" id="editMonsterId" />
+            <div class="input-group">
+              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
+              <input type="text" id="editName" required />
+            </div>
+            <div class="input-group">
+              <label>2. รูปปก Icon (URL):</label>
+              <input type="url" id="editThumbnail" required />
+            </div>
+            <div class="input-group">
+              <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
+              <input type="url" id="editDetailImage" required />
+            </div>
+            <div class="input-group">
+              <label>4. รายละเอียด (General Info):</label>
+              <textarea id="editDescription" rows="4" required></textarea>
+            </div>
+            <div class="input-group">
+              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
+              <input type="text" id="editWeaknessText" required />
+            </div>
+            <div class="input-group">
+              <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
+              <input type="url" id="editWeaknessChart" />
+            </div>
+            <button
+              type="submit"
+              class="game-button submit-btn"
+              style="border-color: #1565c0; color: #1565c0"
+            >
+              บันทึกการแก้ไข
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-dots">
+      <div class="dot active" onclick="scrollToSection(0)"></div>
+      <div class="dot" onclick="scrollToSection(1)"></div>
+      <div class="dot" onclick="scrollToSection(2)"></div>
+    </div>
+
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
