@@ -40,14 +40,14 @@ body, html {
 .sec1 .monster-grid { position: relative; z-index: 2; }
 .monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 10px; }
 
-/* ➕ CSS สำหรับโลโก้ ซ้ายบน */
+/* ➕ CSS สำหรับโลโก้ ซ้ายบน (ลอยติดจอ) */
 .top-left-logo {
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    height: 150px; 
+    position: fixed;
+    top: 20px;
+    left: 30px;
+    height: 150px; /* ขนาดใหญ่ขึ้นแล้ว */
     width: auto;
-    z-index: 100;
+    z-index: 9999;
     transition: transform 0.3s ease;
 }
 .top-left-logo:hover {
@@ -139,8 +139,13 @@ body, html {
 h2 { margin-top: 0; color: #5f4b8b; }
 .weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
-/* ปุ่มเสียง ล่างซ้าย */
-.audio-container { position: absolute; bottom: 25px; left: 25px; z-index: 1000; }
+/* ปุ่มเสียง ล่างซ้าย (ลอยติดจอ) */
+.audio-container { 
+    position: fixed; 
+    bottom: 25px; 
+    left: 25px; 
+    z-index: 9999; 
+}
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
     padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
@@ -148,9 +153,9 @@ h2 { margin-top: 0; color: #5f4b8b; }
 }
 .game-button:hover { background: #e3c16f; color: #2b2b2b; box-shadow: 0 0 20px rgba(227, 193, 111, 0.8); }
 
-/* ปุ่ม Admin ขวาบน */
+/* ปุ่ม Admin ขวาบน (ลอยติดจอ) */
 .admin-top-right-btn {
-  position: absolute; 
+  position: fixed; 
   top: 25px;
   right: 25px;
   display: flex;
@@ -164,7 +169,7 @@ h2 { margin-top: 0; color: #5f4b8b; }
   cursor: pointer;
   font-size: 16px;
   font-weight: bold;
-  z-index: 100; 
+  z-index: 9999; 
   transition: all 0.3s ease;
 }
 
@@ -321,4 +326,5 @@ body:not(.admin-logged-in) .admin-only {
     .delete-section { bottom: -40px; }
     .nav-dots { right: 10px; }
     .close-btn { top: 10px; right: 10px; }
+    .top-left-logo { height: 80px; } /* ลดขนาดโลโก้ในมือถือ */
 }
