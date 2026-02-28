@@ -26,6 +26,14 @@ body, html {
 }
 
 /* รูปพื้นหลัง */
+
+.section {
+    background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg');
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat;
+}
+
 .sec1 { background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTZiYnVsdXI1ZnVsM3FkaGR4ZWtjNXQ5cmZ5cXhtaGgwOTU1YXQwNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lujYyxyChZSN3asnir/giphy.gif'); }
 .sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
 .sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
@@ -83,6 +91,7 @@ body, html {
 
 /* Grid การ์ดมอนสเตอร์ */
 .monster-grid {
+    
     z-index: 2; display: grid; 
     grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, auto);   
     gap: 15px; width: 90%; max-width: 1400px; 
