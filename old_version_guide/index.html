@@ -84,22 +84,25 @@
         </div>
       </div>
 
-      <div class="section sec2">
-        <h1 class="monster-list-title">Monster List</h1>
-
+      <div class="section sec2" id="sec-world">
+        <h1 class="monster-list-title">Monster List (World)</h1>
         <div class="search-container">
           <input
             type="text"
             id="searchInput"
-            placeholder="🔍 ค้นหาชื่อมอนสเตอร์ (เช่น Rathalos)..."
+            placeholder="🔍 ค้นหาชื่อมอนสเตอร์ทั้งหมด (เช่น Rathalos)..."
             onkeyup="handleSearch(this.value)"
           />
         </div>
-
-        <div class="monster-grid" id="monsterGrid"></div>
+        <div class="monster-grid" id="grid-world"></div>
       </div>
 
-      <div class="section sec3">
+      <div class="section sec3" id="sec-iceborne">
+        <h1 class="monster-list-title" style="color: #81d4fa; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">Monster List (Iceborne)</h1>
+        <div class="monster-grid" id="grid-iceborne"></div>
+      </div>
+
+      <div class="section sec4" id="sec-more">
         <h1 style="color: white; z-index: 2">More to come...</h1>
       </div>
     </div>
@@ -115,57 +118,54 @@
       <div class="book-container add-form-container">
         <div class="close-btn" onclick="closeAddModal()">&times;</div>
         <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #5f4b8b">
-            + เพิ่มมอนสเตอร์ใหม่
-          </h2>
+          <h2 style="text-align: center; color: #5f4b8b">+ เพิ่มมอนสเตอร์ใหม่</h2>
           <form id="addMonsterForm" class="monster-form">
             <div class="input-group">
-              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input
-                type="text"
-                id="newName"
-                placeholder="เช่น Great Jagras"
-                required
-              />
+              <label>หมวดหมู่ภาค (Category):</label>
+              <select id="newCategory" required>
+                <option value="world">ภาค World (พื้นหลังป่า)</option>
+                <option value="iceborne">ภาค Iceborne (พื้นหลังหิมะ)</option>
+              </select>
             </div>
             <div class="input-group">
-              <label>2. รูปปก Icon (อัพโหลดรูปภาพ - ไม่เกิน 1MB):</label>
+              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
+              <input type="text" id="newName" placeholder="เช่น Great Jagras" required />
+            </div>
+            
+            <div class="input-group">
+              <label>2. ประเภท (Species):</label>
+              <input type="text" id="newSpecies" placeholder="เช่น Fanged Wyvern, Elder Dragon" required />
+            </div>
+            <div class="input-group">
+              <label>3. สถานที่พบ (Habitats):</label>
+              <textarea id="newHabitats" rows="2" placeholder="เช่น Ancient Forest&#10;Wildspire Waste" required></textarea>
+            </div>
+            <div class="input-group">
+              <label>4. สถานะผิดปกติ (Ailments Inflicted):</label>
+              <textarea id="newAilments" rows="2" placeholder="เช่น พ่นไฟ (Fireblight)&#10;ติดพิษ (Poison)" required></textarea>
+            </div>
+
+            <div class="input-group">
+              <label>5. รูปปก Icon (อัพโหลดรูปภาพ):</label>
               <input type="file" id="newThumbnail" accept="image/*" required />
             </div>
             <div class="input-group">
-              <label>3. รูปภาพมอนสเตอร์ (อัพโหลดรูปภาพ - ไม่เกิน 1MB):</label>
-              <input
-                type="file"
-                id="newDetailImage"
-                accept="image/*"
-                required
-              />
+              <label>6. รูปภาพมอนสเตอร์ (อัพโหลดรูปภาพ):</label>
+              <input type="file" id="newDetailImage" accept="image/*" required />
             </div>
             <div class="input-group">
-              <label>4. รายละเอียด (General Info):</label>
-              <textarea
-                id="newDescription"
-                rows="4"
-                placeholder="ข้อมูลทั่วไปของมอนสเตอร์..."
-                required
-              ></textarea>
+              <label>7. รายละเอียด (General Info):</label>
+              <textarea id="newDescription" rows="4" placeholder="ข้อมูลทั่วไปของมอนสเตอร์..." required></textarea>
             </div>
             <div class="input-group">
-              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <textarea
-                id="newWeaknessText"
-                rows="3"
-                placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️&#10;แพ้น้ำ (Water) ⭐️"
-                required
-              ></textarea>
+              <label>8. ข้อมูลจุดอ่อน (Weakness Text):</label>
+              <textarea id="newWeaknessText" rows="3" placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️" required></textarea>
             </div>
             <div class="input-group">
-              <label>6. รูปภาพบอกจุดอ่อน (อัพโหลดรูปภาพ - ไม่เกิน 1MB):</label>
+              <label>9. รูปภาพบอกจุดอ่อน (อัพโหลดรูปภาพ):</label>
               <input type="file" id="newWeaknessChart" accept="image/*" />
             </div>
-            <button type="submit" class="game-button submit-btn">
-              บันทึกข้อมูลมอนสเตอร์
-            </button>
+            <button type="submit" class="game-button submit-btn">บันทึกข้อมูลมอนสเตอร์</button>
           </form>
         </div>
       </div>
@@ -175,40 +175,55 @@
       <div class="book-container add-form-container">
         <div class="close-btn" onclick="closeEditModal()">&times;</div>
         <div class="book-content-scroll">
-          <h2 style="text-align: center; color: #1565c0">
-            📝 แก้ไขข้อมูลมอนสเตอร์
-          </h2>
+          <h2 style="text-align: center; color: #1565c0">📝 แก้ไขข้อมูลมอนสเตอร์</h2>
           <form id="editMonsterForm" class="monster-form">
             <input type="hidden" id="editMonsterId" />
+            <div class="input-group">
+              <label>หมวดหมู่ภาค (Category):</label>
+              <select id="editCategory" required>
+                <option value="world">ภาค World (พื้นหลังป่า)</option>
+                <option value="iceborne">ภาค Iceborne (พื้นหลังหิมะ)</option>
+              </select>
+            </div>
             <div class="input-group">
               <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
               <input type="text" id="editName" required />
             </div>
+
             <div class="input-group">
-              <label>2. รูปปก Icon (URL):</label>
-              <input type="url" id="editThumbnail" required />
+              <label>2. ประเภท (Species):</label>
+              <input type="text" id="editSpecies" required />
             </div>
             <div class="input-group">
-              <label>3. รูปภาพมอนสเตอร์ในสมุด (URL):</label>
-              <input type="url" id="editDetailImage" required />
+              <label>3. สถานที่พบ (Habitats):</label>
+              <textarea id="editHabitats" rows="2" required></textarea>
             </div>
             <div class="input-group">
-              <label>4. รายละเอียด (General Info):</label>
+              <label>4. สถานะผิดปกติ (Ailments Inflicted):</label>
+              <textarea id="editAilments" rows="2" required></textarea>
+            </div>
+
+            <div class="input-group">
+              <label>5. รูปปก Icon (เว้นว่างถ้าใช้รูปเดิม):</label>
+              <input type="file" id="editThumbnail" accept="image/*" />
+            </div>
+            <div class="input-group">
+              <label>6. รูปภาพมอนสเตอร์ (เว้นว่างถ้าใช้รูปเดิม):</label>
+              <input type="file" id="editDetailImage" accept="image/*" />
+            </div>
+            <div class="input-group">
+              <label>7. รายละเอียด (General Info):</label>
               <textarea id="editDescription" rows="4" required></textarea>
             </div>
             <div class="input-group">
-              <label>5. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <input type="text" id="editWeaknessText" required />
+              <label>8. ข้อมูลจุดอ่อน (Weakness Text):</label>
+              <textarea id="editWeaknessText" rows="3" required></textarea>
             </div>
             <div class="input-group">
-              <label>6. รูปภาพบอกจุดอ่อน (URL):</label>
-              <input type="url" id="editWeaknessChart" />
+              <label>9. รูปภาพบอกจุดอ่อน (เว้นว่างถ้าใช้รูปเดิม):</label>
+              <input type="file" id="editWeaknessChart" accept="image/*" />
             </div>
-            <button
-              type="submit"
-              class="game-button submit-btn"
-              style="border-color: #1565c0; color: #1565c0"
-            >
+            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">
               บันทึกการแก้ไข
             </button>
           </form>
@@ -216,90 +231,26 @@
       </div>
     </div>
 
-    <div class="nav-dots">
-      <div class="dot active" onclick="scrollToSection(0)"></div>
-      <div class="dot" onclick="scrollToSection(1)"></div>
-      <div class="dot" onclick="scrollToSection(2)"></div>
-    </div>
+    <div class="nav-dots"></div>
 
-    <div
-      id="login-modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <div
-        style="
-          background: #2a2a2a;
-          padding: 30px;
-          border-radius: 10px;
-          border: 1px solid #444;
-          width: 300px;
-        "
-      >
-        <h2 style="color: white; margin-top: 0; text-align: center">
-          Admin Login
-        </h2>
-        <form
-          id="admin-login-form"
-          style="display: flex; flex-direction: column; gap: 15px"
-        >
-          <input
-            type="text"
-            placeholder="Username"
-            required
-            style="padding: 10px; border-radius: 5px; border: none"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            style="padding: 10px; border-radius: 5px; border: none"
-          />
+    <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; justify-content: center; align-items: center;">
+      <div style="background: #2a2a2a; padding: 30px; border-radius: 10px; border: 1px solid #444; width: 300px;">
+        <h2 style="color: white; margin-top: 0; text-align: center">Admin Login</h2>
+        <form id="admin-login-form" style="display: flex; flex-direction: column; gap: 15px">
+          <input type="text" placeholder="Username" required style="padding: 10px; border-radius: 5px; border: none" />
+          <input type="password" placeholder="Password" required style="padding: 10px; border-radius: 5px; border: none" />
           <div style="display: flex; gap: 10px">
-            <button
-              type="submit"
-              style="
-                flex: 1;
-                padding: 10px;
-                background: #27ae60;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-              "
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              onclick="closeLoginModal()"
-              style="
-                flex: 1;
-                padding: 10px;
-                background: #e74c3c;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-              "
-            >
-              Cancel
-            </button>
+            <button type="submit" style="flex: 1; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Login</button>
+            <button type="button" onclick="closeLoginModal()" style="flex: 1; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
           </div>
         </form>
       </div>
     </div>
 
     <script type="module" src="index.js"></script>
+    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox()">
+      <span class="lightbox-close">&times;</span>
+      <img class="lightbox-content" id="lightboxImg">
+    </div>
   </body>
 </html>

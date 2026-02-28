@@ -20,23 +20,35 @@ body, html {
     display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 
-.sec2::before, .sec3::before {
+/* ตั้งค่าให้มีเลเยอร์ดำบางๆ เพื่อให้อ่านตัวหนังสือออก */
+.sec2::before, .sec3::before, .sec4::before, .dynamic-page-world::before, .dynamic-page-iceborne::before {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); z-index: 1;
 }
 
-/* รูปพื้นหลัง */
+/* รูปพื้นหลังแต่ละ Section */
+.sec1 { background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTZiYnVsdXI1ZnVsM3FkaGR4ZWtjNXQ5cmZ5cXhtaGgwOTU1YXQwNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lujYyxyChZSN3asnir/giphy.gif'); }
 
-.section {
-    background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg');
+/* พื้นหลัง World และหน้า World ที่เพิ่มขึ้นมาใหม่ */
+.sec2, .dynamic-page-world { 
+    background-image: url('BG_world.avif'); 
     background-size: cover; 
     background-position: center; 
-    background-repeat: no-repeat;
 }
 
-.sec1 { background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTZiYnVsdXI1ZnVsM3FkaGR4ZWtjNXQ5cmZ5cXhtaGgwOTU1YXQwNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lujYyxyChZSN3asnir/giphy.gif'); }
-.sec2 { background-image: url('https://gamingbolt.com/wp-content/uploads/2019/05/Monster-Hunter-World-Iceborne.jpg'); }
-.sec3 { background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); }
+/* พื้นหลัง Iceborne และหน้า Iceborne ที่เพิ่มขึ้นมาใหม่ */
+.sec3, .dynamic-page-iceborne { 
+    background-image: url('BG_iceborn.jpg'); 
+    background-size: cover; 
+    background-position: center; 
+}
+
+/* หน้า More to come */
+.sec4 { 
+    background-image: url('https://i.redd.it/4i8yzr461d351.jpg'); 
+    background-size: cover; 
+    background-position: center; 
+}
 
 /* Youtube Background */
 .youtube-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 0; pointer-events: none; }
@@ -53,7 +65,7 @@ body, html {
     position: fixed;
     top: 20px;
     left: 30px;
-    height: 150px; /* ขนาดใหญ่ขึ้นแล้ว */
+    height: 150px; 
     width: auto;
     z-index: 9999;
     transition: transform 0.3s ease;
@@ -91,7 +103,6 @@ body, html {
 
 /* Grid การ์ดมอนสเตอร์ */
 .monster-grid {
-    
     z-index: 2; display: grid; 
     grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, auto);   
     gap: 15px; width: 90%; max-width: 1400px; 
@@ -100,8 +111,9 @@ body, html {
 .section.active .monster-grid { opacity: 1; transform: translateY(0); }
 
 .monster-card, .add-monster-card {
-    width: 100%; aspect-ratio: 2/3; height: 280; 
-    background-color: #333; background-size:contain; background-position: center;
+    width: 100%; aspect-ratio: 2/3; height: 280;
+    background-color: black; /* ✅ เปลี่ยนเป็นสีดำสนิท */
+    background-size:contain; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -145,16 +157,14 @@ body, html {
 .monster-image-large img { width: 100%; height: 350px; object-fit: cover; object-position: top center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .monster-info { flex: 2; min-width: 300px; }
 .info-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
+.info-section p {
+    white-space: pre-line;
+}
 h2 { margin-top: 0; color: #5f4b8b; }
 .weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
 /* ปุ่มเสียง ล่างซ้าย (ลอยติดจอ) */
-.audio-container { 
-    position: fixed; 
-    bottom: 25px; 
-    left: 25px; 
-    z-index: 9999; 
-}
+.audio-container { position: fixed; bottom: 25px; left: 25px; z-index: 9999; }
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
     padding: 10px 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease;
@@ -181,121 +191,39 @@ h2 { margin-top: 0; color: #5f4b8b; }
   z-index: 9999; 
   transition: all 0.3s ease;
 }
-
-.admin-top-right-btn:hover {
-  background: #ffcc00; 
-  color: #000000;      
-  border-color: #ffcc00;
-  transform: scale(1.05); 
-}
-
-.logout-variant:hover {
-  background: #e74c3c !important; 
-  border-color: #e74c3c !important;
-  color: white !important;
-}
-
-body:not(.admin-logged-in) .admin-only {
-  display: none !important;
-}
+.admin-top-right-btn:hover { background: #ffcc00; color: #000000; border-color: #ffcc00; transform: scale(1.05); }
+.logout-variant:hover { background: #e74c3c !important; border-color: #e74c3c !important; color: white !important; }
+body:not(.admin-logged-in) .admin-only { display: none !important; }
 
 /* Hero Section */
 .hero-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    z-index: 2;
-    padding: 0 20px;
-    height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; z-index: 2; padding: 0 20px; height: 100%;
 }
-
-.hero-title {
-    font-size: 5.5rem;
-    color: #fff;
-    margin: 0;
-    line-height: 1.1;
-    text-shadow: 4px 4px 10px rgba(0,0,0,0.9);
-    font-weight: 900;
-    letter-spacing: 2px;
-}
-
-.hero-subtitle {
-    color: #ddd;
-    font-size: 1.3rem;
-    margin: 25px 0 45px;
-    max-width: 800px;
-    line-height: 1.6;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
-    font-weight: 500;
-}
-
+.hero-title { font-size: 5.5rem; color: #fff; margin: 0; line-height: 1.1; text-shadow: 4px 4px 10px rgba(0,0,0,0.9); font-weight: 900; letter-spacing: 2px; }
+.hero-subtitle { color: #ddd; font-size: 1.3rem; margin: 25px 0 45px; max-width: 800px; line-height: 1.6; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); font-weight: 500; }
 .hero-buttons { display: flex; gap: 20px; }
-
 .primary-btn {
-    padding: 15px 35px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-    background: #e3c16f;
-    color: #2b2b2b;
-    border: 2px solid #e3c16f;
-    box-shadow: 0 4px 15px rgba(227, 193, 111, 0.4);
+    padding: 15px 35px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease;
+    text-transform: uppercase; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    background: #e3c16f; color: #2b2b2b; border: 2px solid #e3c16f; box-shadow: 0 4px 15px rgba(227, 193, 111, 0.4);
 }
+.primary-btn:hover { background: #fff; border-color: #fff; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6); }
 
-.primary-btn:hover {
-    background: #fff;
-    border-color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.6);
-}
-
-/* Scroll Down & Dots ตรงกลางเป๊ะๆ */
+/* Scroll Down & Dots */
 .scroll-down { 
-    position: absolute; 
-    bottom: 25px; 
-    left: 50%; 
-    transform: translateX(-50%);
-    z-index: 10; 
-    animation: bounce 2s infinite; 
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+    z-index: 10; animation: bounce 2s infinite; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-
-.scroll-text {
-    color: white;
-    font-size: 1rem;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-    letter-spacing: 1px;
-}
-
-.arrow { 
-    width: 18px; 
-    height: 18px; 
-    border-bottom: 4px solid white; 
-    border-right: 4px solid white; 
-    transform: rotate(45deg); 
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
-}
-
-@keyframes bounce { 
-    0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 
-    40% {transform: translateX(-50%) translateY(-15px);} 
-}
-
+.scroll-text { color: white; font-size: 1rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); letter-spacing: 1px; }
+.arrow { width: 18px; height: 18px; border-bottom: 4px solid white; border-right: 4px solid white; transform: rotate(45deg); box-shadow: 2px 2px 3px rgba(0,0,0,0.5); }
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);} 40% {transform: translateX(-50%) translateY(-15px);} }
 .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); z-index: 10; }
 .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.5); margin: 15px 0; border-radius: 50%; cursor: pointer; transition: 0.3s; }
 .dot.active { background: white; transform: scale(1.5); }
 
-/* ปุ่มและฟอร์มต่างๆ */
+/* ฟอร์มและ Input */
 .add-monster-card { background-color: #444; display: flex; justify-content: center; align-items: center; border: 3px dashed #777; transition: all 0.3s; }
 .add-monster-card:hover { transform: scale(1.05) translateY(-10px); background-color: #555; border-color: #e3c16f; box-shadow: 0 10px 20px rgba(227, 193, 111, 0.3); }
 .add-icon { font-size: 3rem; color: #888; transition: color 0.3s; }
@@ -304,8 +232,11 @@ body:not(.admin-logged-in) .admin-only {
 .monster-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 .input-group { display: flex; flex-direction: column; gap: 5px; }
 .input-group label { font-weight: bold; color: #3e2723; font-size: 1.1rem; }
-.input-group input, .input-group textarea { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
-.input-group input:focus, .input-group textarea:focus { outline: none; border-color: #5f4b8b; }
+
+/* ➕ เพิ่ม select เข้าไปจัดสไตล์ให้ตรงกับกล่องอื่นๆ */
+.input-group input, .input-group textarea, .input-group select { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
+.input-group input:focus, .input-group textarea:focus, .input-group select:focus { outline: none; border-color: #5f4b8b; }
+
 .submit-btn { margin-top: 20px; padding: 15px; font-size: 1.2rem; text-align: center; width: 100%; }
 .delete-section { position: absolute; bottom: -50px; left: 0px; z-index: 105; display: flex; gap: 15px; align-items: center; }
 .delete-btn, .edit-btn { background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s, color 0.2s; }
@@ -335,5 +266,50 @@ body:not(.admin-logged-in) .admin-only {
     .delete-section { bottom: -40px; }
     .nav-dots { right: 10px; }
     .close-btn { top: 10px; right: 10px; }
-    .top-left-logo { height: 80px; } /* ลดขนาดโลโก้ในมือถือ */
+    .top-left-logo { height: 80px; } 
+}
+
+/* ---ระบบขยายรูป (Lightbox) --- */
+.lightbox-overlay {
+    display: none; /* ซ่อนไว้ก่อน */
+    position: fixed;
+    z-index: 10001; /* ให้อยู่เหนือทุกอย่าง */
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.9); /* พื้นหลังดำโปร่งแสง */
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+}
+
+.lightbox-content {
+    max-width: 90%;
+    max-height: 90%;
+    border: 3px solid #e3c16f;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from {transform: scale(0.5); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px; right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ปรับให้รูปในสมุดมี Cursor เป็นรูปแว่นขยาย */
+.monster-image-large img, .weakness-img {
+    cursor: zoom-in;
+    transition: transform 0.2s;
+}
+.monster-image-large img:hover, .weakness-img:hover {
+    transform: scale(1.02);
 }

@@ -1,5 +1,5 @@
 let currentSection = 0;
-let totalSections = 3; 
+let totalSections = 4; 
 let isScrolling = false;
 const container = document.getElementById('mainContainer');
 let sections = document.querySelectorAll('.section');
@@ -50,15 +50,28 @@ async function loadMonsters() {
 
 function renderMonsterGrid(monstersToRender) {
     const book = document.getElementById('bookContent');
-    const mainContainer = document.getElementById('mainContainer');
-    const sec2 = document.querySelector('.sec2'); 
-    const sec3 = document.querySelector('.sec3'); 
-
+    
     document.querySelectorAll('.dynamic-page').forEach(el => el.remove());
     book.innerHTML = ''; 
 
-    let allItems = [...monstersToRender];
-    allItems.push({ type: 'add_button', id: 'add-btn-unique' });
+    const worldMonsters = monstersToRender.filter(m => m.data.category !== 'iceborne'); 
+    const iceborneMonsters = monstersToRender.filter(m => m.data.category === 'iceborne');
+
+    renderCategory(worldMonsters, 'sec-world', 'Monster List (World)', 'world');
+    renderCategory(iceborneMonsters, 'sec-iceborne', 'Monster List (Iceborne)', 'iceborne');
+
+    updateNavigation();
+}
+
+function renderCategory(items, baseSectionId, titleText, category) {
+    const baseSec = document.getElementById(baseSectionId);
+    if (!baseSec) return;
+    
+    let targetGrid = baseSec.querySelector('.monster-grid');
+    targetGrid.innerHTML = '';
+
+    let allItems = [...items];
+    allItems.push({ type: 'add_button', id: `add-btn-${category}`, category: category });
 
     const itemsPerPage = 12;
     const pages = [];
@@ -66,31 +79,40 @@ function renderMonsterGrid(monstersToRender) {
         pages.push(allItems.slice(i, i + itemsPerPage));
     }
 
-    pages.forEach((pageItems, pageIndex) => {
-        let targetGrid;
+    let previousNode = baseSec;
 
+    pages.forEach((pageItems, pageIndex) => {
+        let currentGrid;
+        
         if (pageIndex === 0) {
-            targetGrid = sec2.querySelector('.monster-grid');
-            targetGrid.innerHTML = ''; 
+            currentGrid = targetGrid;
+            const title = baseSec.querySelector('.monster-list-title');
+            if(title) title.innerText = titleText;
         } else {
-            const newSection = sec2.cloneNode(true);
-            newSection.classList.remove('sec2'); 
-            newSection.classList.add('dynamic-page'); 
+            const newSection = baseSec.cloneNode(true);
+            newSection.id = ''; 
+            newSection.classList.remove('sec2', 'sec3'); 
+            newSection.classList.add('dynamic-page', `dynamic-page-${category}`); 
             
             const searchBox = newSection.querySelector('.search-container');
             if (searchBox) searchBox.remove();
 
             const title = newSection.querySelector('.monster-list-title');
-            if(title) title.innerText = `Monster List (Page ${pageIndex + 1})`;
-            targetGrid = newSection.querySelector('.monster-grid');
-            targetGrid.innerHTML = ''; 
-            mainContainer.insertBefore(newSection, sec3);
+            if(title) title.innerText = `${titleText} (Page ${pageIndex + 1})`;
+            
+            currentGrid = newSection.querySelector('.monster-grid');
+            currentGrid.innerHTML = ''; 
+            
+            previousNode.parentNode.insertBefore(newSection, previousNode.nextSibling);
+            previousNode = newSection;
         }
+
+        const book = document.getElementById('bookContent');
 
         pageItems.forEach(item => {
             if (item.type === 'add_button') {
-                const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal()"><div class="add-icon">+</div></div>`;
-                targetGrid.insertAdjacentHTML('beforeend', addCardHTML);
+                const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal('${item.category}')"><div class="add-icon">+</div></div>`;
+                currentGrid.insertAdjacentHTML('beforeend', addCardHTML);
             } else {
                 const m = item.data;
                 const id = item.id;
@@ -100,13 +122,14 @@ function renderMonsterGrid(monstersToRender) {
                         <div class="monster-name-tag">${m.name}</div>
                     </div>
                 `;
-                targetGrid.insertAdjacentHTML('beforeend', cardHTML);
+                currentGrid.insertAdjacentHTML('beforeend', cardHTML);
 
-                targetGrid.lastElementChild.addEventListener('click', () => {
+                currentGrid.lastElementChild.addEventListener('click', () => {
                     openModal(id);
                 });
 
                 if (!document.getElementById(`content-${id}`)) {
+                    // ⚠️ เพิ่มการแสดงผลข้อมูลใหม่ (Species, Habitats, Ailments) ตรงนี้
                     const pageHTML = `
                         <div id="content-${id}" class="monster-detail-layout" style="display: none;">
                             <div class="monster-image-large">
@@ -138,6 +161,9 @@ function renderMonsterGrid(monstersToRender) {
                                 <h2>${m.name}</h2>
                                 <div class="info-section">
                                     <h3>General Info</h3>
+                                    <p style="margin-bottom: 5px;"><strong>🦖 ประเภท (Species):</strong> ${m.species || 'ไม่ระบุ'}</p>
+                                    <p style="margin-bottom: 5px;"><strong>📍 สถานที่พบ (Habitats):</strong> ${m.habitats || 'ไม่ระบุ'}</p>
+                                    <p style="margin-bottom: 15px;"><strong>☠️ สถานะผิดปกติ (Ailments):</strong> ${m.ailments || 'ไม่มี'}</p>
                                     <p>${m.description}</p>
                                 </div>
                                 <div class="info-section">
@@ -153,7 +179,6 @@ function renderMonsterGrid(monstersToRender) {
             }
         });
     });
-    updateNavigation();
 }
 
 window.handleSearch = function(searchTerm) {
@@ -176,7 +201,7 @@ window.handleSearch = function(searchTerm) {
 }
 
 function updateNavigation() {
-    sections = document.querySelectorAll('.section'); 
+    sections = document.querySelectorAll('.section, .dynamic-page'); 
     totalSections = sections.length;
     const dotContainer = document.querySelector('.nav-dots');
     if(dotContainer) {
@@ -193,7 +218,6 @@ function updateNavigation() {
 
 loadMonsters(); 
 
-// --- ระบบ Scroll ---
 function scrollToSection(index) {
     if (index < 0 || index >= totalSections) return;
     currentSection = index;
@@ -222,7 +246,6 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp') scrollToSection(currentSection - 1);
 });
 
-// --- ระบบ Modal ---
 function openModal(monsterId) {
     modal.classList.add('show');
     const allContents = document.querySelectorAll('.monster-detail-layout');
@@ -240,20 +263,27 @@ modal.addEventListener('click', (e) => {
 });
 window.closeModal = closeModal;
 
-window.openAddModal = function() { document.getElementById('addMonsterModal').classList.add('show'); }
+window.openAddModal = function(category) { 
+    const catSelect = document.getElementById('newCategory');
+    if(catSelect && category) { catSelect.value = category; }
+    document.getElementById('addMonsterModal').classList.add('show'); 
+}
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
-
 
 window.openEditModal = function(id) {
     const m = monstersData[id];
     if (m) {
         document.getElementById('editMonsterId').value = id;
+        document.getElementById('editCategory').value = m.category || 'world';
         document.getElementById('editName').value = m.name;
-        document.getElementById('editThumbnail').value = m.thumbnail;
-        document.getElementById('editDetailImage').value = m.detailImage;
+        
+        // ดึงข้อมูลใหม่มาแสดงตอนแก้ไข
+        document.getElementById('editSpecies').value = m.species || '';
+        document.getElementById('editHabitats').value = m.habitats || '';
+        document.getElementById('editAilments').value = m.ailments || '';
+
         document.getElementById('editDescription').value = m.description;
         document.getElementById('editWeaknessText').value = m.weaknessText;
-        document.getElementById('editWeaknessChart').value = m.weaknessChart || '';
         document.getElementById('editMonsterModal').classList.add('show');
     }
 }
@@ -262,27 +292,149 @@ document.getElementById('editMonsterModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('editMonsterModal')) closeEditModal();
 });
 
+function convertFileToBase64(fileInput) {
+    return new Promise((resolve, reject) => {
+        const file = fileInput.files[0];
+        if (!file) {
+            resolve(""); 
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                let width = img.width;
+                let height = img.height;
+                const MAX_SIZE = 800; 
+
+                if (width > height) {
+                    if (width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    }
+                } else {
+                    if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+
+                // ไม่ต้องเทสีขาวทับแล้ว ให้มันทะลุเหมือนเดิม
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // ✅ เปลี่ยนจากการแปลงเป็น jpeg มาเป็น webp (รองรับโปร่งใสและขนาดไฟล์เล็ก)
+                const webpBase64 = canvas.toDataURL("image/webp", 0.8);
+                resolve(webpBase64);
+            };
+            img.onerror = () => reject("ไฟล์รูปภาพมีปัญหา ไม่สามารถอ่านได้");
+            img.src = event.target.result;
+        };
+        
+        reader.onerror = error => reject("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ");
+    });
+}
+
+document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
+
+    try {
+        const thumbnailBase64 = await convertFileToBase64(document.getElementById('newThumbnail'));
+        const detailImageBase64 = await convertFileToBase64(document.getElementById('newDetailImage'));
+        const weaknessChartBase64 = await convertFileToBase64(document.getElementById('newWeaknessChart'));
+
+        const newMonsterData = {
+            category: document.getElementById('newCategory').value,
+            name: document.getElementById('newName').value,
+            
+            // ส่งข้อมูล 3 ตัวใหม่ขึ้น Firebase
+            species: document.getElementById('newSpecies').value,
+            habitats: document.getElementById('newHabitats').value,
+            ailments: document.getElementById('newAilments').value,
+
+            thumbnail: thumbnailBase64,
+            detailImage: detailImageBase64,
+            description: document.getElementById('newDescription').value,
+            weaknessText: document.getElementById('newWeaknessText').value,
+            weaknessChart: weaknessChartBase64,
+            createdAt: Date.now() 
+        };
+
+        await addDoc(collection(db, "monsters"), newMonsterData);
+        alert("✅ เพิ่มสำเร็จ!");
+        closeAddModal(); 
+        e.target.reset(); 
+        loadMonsters(); 
+    } catch (error) { 
+        console.error(error);
+        alert("❌ เกิดข้อผิดพลาด: " + (error.message || error)); 
+    } finally { 
+        btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; 
+        btn.disabled = false; 
+    }
+});
+
 document.getElementById('editMonsterForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     btn.innerHTML = "⏳ กำลังอัปเดต..."; btn.disabled = true;
-    const id = document.getElementById('editMonsterId').value;
     
-    const updatedData = {
-        name: document.getElementById('editName').value,
-        thumbnail: document.getElementById('editThumbnail').value,
-        detailImage: document.getElementById('editDetailImage').value,
-        description: document.getElementById('editDescription').value,
-        weaknessText: document.getElementById('editWeaknessText').value,
-        weaknessChart: document.getElementById('editWeaknessChart').value
-    };
-
+    const id = document.getElementById('editMonsterId').value;
+    const m = monstersData[id]; // ข้อมูลเดิมจาก Firebase ที่โหลดไว้ตอนแรก
+    
     try {
+        // เช็ค Thumbnail: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.thumbnail (ของเดิม)
+        let finalThumbnail = m.thumbnail;
+        if(document.getElementById('editThumbnail').files.length > 0) {
+            finalThumbnail = await convertFileToBase64(document.getElementById('editThumbnail'));
+        }
+
+        // เช็ค Detail Image: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.detailImage (ของเดิม)
+        let finalDetailImage = m.detailImage;
+        if(document.getElementById('editDetailImage').files.length > 0) {
+            finalDetailImage = await convertFileToBase64(document.getElementById('editDetailImage'));
+        }
+
+        // เช็ค Weakness Chart: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.weaknessChart (ของเดิม)
+        let finalWeaknessChart = m.weaknessChart || "";
+        if(document.getElementById('editWeaknessChart').files.length > 0) {
+            finalWeaknessChart = await convertFileToBase64(document.getElementById('editWeaknessChart'));
+        }
+
+        const updatedData = {
+            category: document.getElementById('editCategory').value,
+            name: document.getElementById('editName').value,
+            species: document.getElementById('editSpecies').value,
+            habitats: document.getElementById('editHabitats').value,
+            ailments: document.getElementById('editAilments').value,
+            thumbnail: finalThumbnail, // ส่งรูป (ใหม่หรือเก่า) กลับไป
+            detailImage: finalDetailImage,
+            description: document.getElementById('editDescription').value,
+            weaknessText: document.getElementById('editWeaknessText').value,
+            weaknessChart: finalWeaknessChart
+        };
+
         await updateDoc(doc(db, "monsters", id), updatedData);
         alert("✅ แก้ไขเรียบร้อย!");
-        closeEditModal(); closeModal(); loadMonsters();
-    } catch (error) { alert("❌ เกิดข้อผิดพลาด"); } 
-    finally { btn.innerHTML = "บันทึกการแก้ไข"; btn.disabled = false; }
+        closeEditModal(); 
+        closeModal(); 
+        loadMonsters(); // โหลดหน้าเว็บใหม่เพื่ออัปเดตข้อมูลล่าสุด
+    } catch (error) { 
+        console.error(error);
+        alert("❌ เกิดข้อผิดพลาด: " + error.message); 
+    } finally { 
+        btn.innerHTML = "บันทึกการแก้ไข"; 
+        btn.disabled = false; 
+    }
 });
 
 window.toggleDeleteConfirm = function(id) {
@@ -294,7 +446,9 @@ window.deleteMonster = async function(id) {
         closeModal();
         await deleteDoc(doc(db, "monsters", id));
         alert("🗑️ ลบข้อมูลเรียบร้อยแล้ว!"); loadMonsters(); 
-    } catch (error) { alert("❌ เกิดข้อผิดพลาดในการลบ"); }
+    } catch (error) { 
+        alert("❌ เกิดข้อผิดพลาดในการลบ: " + (error.message || error)); 
+    }
 }
 
 var tag = document.createElement('script');
@@ -410,59 +564,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Helper function: Converts an image file into a Base64 text string
-function convertFileToBase64(fileInput) {
-    return new Promise((resolve, reject) => {
-        const file = fileInput.files[0];
-        if (!file) {
-            resolve(""); // Return empty string if no file is selected
-            return;
-        }
-
-        // Check file size (1MB limit = 1,048,576 bytes)
-        if (file.size > 1048576) {
-            reject("ไฟล์ใหญ่เกินไป! กรุณาใช้รูปภาพขนาดไม่เกิน 1MB");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+// ฟังก์ชันสำหรับเปิดรูปใหญ่
+window.openLightbox = function(src) {
+    const lightbox = document.getElementById('imageLightbox');
+    const img = document.getElementById('lightboxImg');
+    img.src = src;
+    lightbox.style.display = 'flex';
 }
 
-document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
-
-    try {
-        // Convert the files to Base64 strings instead of grabbing the useless '.value'
-        const thumbnailBase64 = await convertFileToBase64(document.getElementById('newThumbnail'));
-        const detailImageBase64 = await convertFileToBase64(document.getElementById('newDetailImage'));
-        const weaknessChartBase64 = await convertFileToBase64(document.getElementById('newWeaknessChart'));
-
-        const newMonsterData = {
-            name: document.getElementById('newName').value,
-            thumbnail: thumbnailBase64,
-            detailImage: detailImageBase64,
-            description: document.getElementById('newDescription').value,
-            weaknessText: document.getElementById('newWeaknessText').value,
-            weaknessChart: weaknessChartBase64,
-            createdAt: Date.now() 
-        };
-
-        await addDoc(collection(db, "monsters"), newMonsterData);
-        alert("✅ เพิ่มสำเร็จ!");
-        closeAddModal(); 
-        e.target.reset(); 
-        loadMonsters(); 
-    } catch (error) { 
-        console.error(error);
-        alert("❌ " + error); 
-    } finally { 
-        btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; 
-        btn.disabled = false; 
-    }
-});
+// ฟังก์ชันสำหรับปิดรูปใหญ่
+window.closeLightbox = function() {
+    document.getElementById('imageLightbox').style.display = 'none';
+}
