@@ -121,6 +121,7 @@ function renderCategory(items, baseSectionId, titleText, category) {
                 }
             });
 
+            // ✅ เปลี่ยน Emoji เป็น SVG Icon ลายเส้นสีทอง ให้ดูเข้าธีมเกม
             if (!document.getElementById(`content-${id}`)) {
                 const pageHTML = `
                     <div id="content-${id}" class="monster-detail-layout" style="display: none;">
@@ -131,9 +132,18 @@ function renderCategory(items, baseSectionId, titleText, category) {
                             <h2>${m.name}</h2>
                             <div class="info-section">
                                 <h3>General Info</h3>
-                                <p style="margin-bottom: 5px;"><strong>🦖 ประเภท (Species):</strong> ${m.species || 'ไม่ระบุ'}</p>
-                                <p style="margin-bottom: 5px;"><strong>📍 สถานที่พบ (Habitats):</strong> ${m.habitats || 'ไม่ระบุ'}</p>
-                                <p style="margin-bottom: 15px;"><strong>☠️ สถานะผิดปกติ (Ailments):</strong> ${m.ailments || 'ไม่มี'}</p>
+                                <p style="margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e3c16f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                                    <span><strong>ประเภท (Species):</strong> ${m.species || 'ไม่ระบุ'}</span>
+                                </p>
+                                <p style="margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e3c16f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    <span><strong>สถานที่พบ (Habitats):</strong> ${m.habitats || 'ไม่ระบุ'}</span>
+                                </p>
+                                <p style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e3c16f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    <span><strong>สถานะผิดปกติ (Ailments):</strong> ${m.ailments || 'ไม่มี'}</span>
+                                </p>
                                 <p>${m.description}</p>
                             </div>
                             <div class="info-section">
@@ -304,7 +314,6 @@ window.handleSearch = function(searchTerm) {
     }
 }
 
-// ================= ระบบหยุดการเลื่อนจอเมื่อเปิด Popup =================
 function isModalOpen() {
     const lb = document.getElementById('imageLightbox');
     return modal.classList.contains('show') || 
@@ -366,6 +375,49 @@ window.openAddModal = function() {
 }
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
 
+document.getElementById('addMonsterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerText;
+    
+    submitBtn.innerText = "กำลังอัปโหลดรูปภาพและบันทึก..."; 
+    submitBtn.disabled = true;
+
+    try {
+        const thumbnailURL = await uploadToImgBB(document.getElementById('newThumbnail'));
+        const detailImageURL = await uploadToImgBB(document.getElementById('newDetailImage'));
+        const weaknessChartURL = await uploadToImgBB(document.getElementById('newWeaknessChart'));
+
+        const newMonsterData = {
+            category: document.getElementById('newCategory').value,
+            name: document.getElementById('newName').value,
+            species: document.getElementById('newSpecies').value,
+            habitats: document.getElementById('newHabitats').value,
+            ailments: document.getElementById('newAilments').value,
+            description: document.getElementById('newDescription').value,
+            weaknessText: document.getElementById('newWeaknessText').value,
+            thumbnail: thumbnailURL,       
+            detailImage: detailImageURL,   
+            weaknessChart: weaknessChartURL, 
+            createdAt: Date.now() 
+        };
+
+        await addDoc(collection(db, "monsters"), newMonsterData);
+
+        alert("เพิ่มมอนสเตอร์สำเร็จ!");
+        this.reset(); 
+        closeAddModal(); 
+        loadMonsters(); 
+
+    } catch (error) {
+        console.error("Error adding monster:", error);
+        alert("เกิดข้อผิดพลาด: " + error.message);
+    } finally {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
 window.openEditModal = function(id) {
     const m = monstersData[id];
     if (m) {
@@ -397,42 +449,22 @@ async function uploadToImgBB(fileInput) {
     formData.append("image", file);
 
     try {
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, { method: "POST", body: formData });
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+            method: "POST",
+            body: formData
+        });
         const data = await response.json();
         
-        if (data.success) { return data.data.url; } 
-        else { throw new Error("ImgBB Upload Failed: " + data.error.message); }
-    } catch (error) { throw error; }
-}
-
-document.getElementById('addMonsterForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerText;
-    submitBtn.innerText = "กำลังอัปโหลดรูปภาพและบันทึก..."; submitBtn.disabled = true;
-
-    try {
-        const thumbnailURL = await uploadToImgBB(document.getElementById('newThumbnail'));
-        const detailImageURL = await uploadToImgBB(document.getElementById('newDetailImage'));
-        const weaknessChartURL = await uploadToImgBB(document.getElementById('newWeaknessChart'));
-
-        const newMonsterData = {
-            category: document.getElementById('newCategory').value,
-            name: document.getElementById('newName').value,
-            species: document.getElementById('newSpecies').value,
-            habitats: document.getElementById('newHabitats').value,
-            ailments: document.getElementById('newAilments').value,
-            description: document.getElementById('newDescription').value,
-            weaknessText: document.getElementById('newWeaknessText').value,
-            thumbnail: thumbnailURL, detailImage: detailImageURL, weaknessChart: weaknessChartURL,
-            createdAt: Date.now() 
-        };
-        await addDoc(collection(db, "monsters"), newMonsterData);
-        alert("เพิ่มมอนสเตอร์สำเร็จ!"); this.reset(); closeAddModal(); loadMonsters();
+        if (data.success) {
+            return data.data.url; 
+        } else {
+            throw new Error("ImgBB Upload Failed: " + data.error.message);
+        }
     } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-    } finally { submitBtn.innerText = originalText; submitBtn.disabled = false; }
-});
+        console.error("Upload error:", error);
+        throw error;
+    }
+}
 
 document.getElementById('editMonsterForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -440,7 +472,8 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
     const id = document.getElementById('editMonsterId').value;
     const oldData = monstersData[id]; 
     
-    submitBtn.innerText = "กำลังอัปเดต..."; submitBtn.disabled = true;
+    submitBtn.innerText = "กำลังอัปเดต...";
+    submitBtn.disabled = true;
 
     try {
         const thumbInput = document.getElementById('editThumbnail');
@@ -459,13 +492,20 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
             ailments: document.getElementById('editAilments').value,
             description: document.getElementById('editDescription').value,
             weaknessText: document.getElementById('editWeaknessText').value,
-            thumbnail: thumbnailURL, detailImage: detailImageURL, weaknessChart: weaknessChartURL
+            thumbnail: thumbnailURL,
+            detailImage: detailImageURL,
+            weaknessChart: weaknessChartURL
         };
+
         await updateDoc(doc(db, "monsters", id), updatedData);
-        alert("แก้ไขเรียบร้อย!"); closeEditModal(); loadMonsters();
+        alert("แก้ไขเรียบร้อย!");
+        closeEditModal(); loadMonsters();
     } catch (error) {
         alert("เกิดข้อผิดพลาด: " + error.message);
-    } finally { submitBtn.innerText = "บันทึกการแก้ไข"; submitBtn.disabled = false; }
+    } finally {
+        submitBtn.innerText = "บันทึกการแก้ไข";
+        submitBtn.disabled = false;
+    }
 });
 
 var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
@@ -510,9 +550,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ==========================================
-// ✅ ระบบ Lightbox ซูมและคลิกลากแพนภาพ
-// ==========================================
 let zoomLevel = 1;
 let isDraggingImg = false;
 let startX = 0, startY = 0, translateX = 0, translateY = 0;
@@ -522,50 +559,45 @@ const lightboxImg = document.getElementById('lightboxImg');
 window.openLightbox = function(src) { 
     lightboxImg.src = src; 
     lightboxOverlay.style.display = 'flex'; 
-    // รีเซ็ตค่าการซูมและตำแหน่งทุกครั้งที่เปิดใหม่
     zoomLevel = 1;
     translateX = 0;
     translateY = 0;
     lightboxImg.style.transform = `translate(0px, 0px) scale(1)`;
-    lightboxImg.style.transition = 'transform 0.3s ease'; // เด้งแบบนุ่มๆ
+    lightboxImg.style.transition = 'transform 0.3s ease'; 
 }
 
 window.closeLightbox = function() { 
     lightboxOverlay.style.display = 'none'; 
 }
 
-// กดที่พื้นหลังดำให้ปิดหน้าต่าง
 lightboxOverlay.addEventListener('click', function(e) {
     if (e.target === lightboxOverlay) {
         window.closeLightbox();
     }
 });
 
-// ใช้ลูกกลิ้งเมาส์เพื่อซูม
 lightboxOverlay.addEventListener('wheel', function(e) {
     if (lightboxOverlay.style.display !== 'flex') return;
-    e.preventDefault(); // ไม่ให้เผลอไปเลื่อนหน้าจอ
+    e.preventDefault(); 
     
-    lightboxImg.style.transition = 'transform 0.1s ease'; // ปรับความไวการซูมให้ลื่นไหล
+    lightboxImg.style.transition = 'transform 0.1s ease'; 
     
     if (e.deltaY < 0) {
-        zoomLevel += 0.15; // เลื่อนขึ้น = ซูมเข้า
+        zoomLevel += 0.15; 
     } else {
-        zoomLevel -= 0.15; // เลื่อนลง = ซูมออก
+        zoomLevel -= 0.15; 
     }
     
-    // ล็อกระยะการซูมไม่ให้เล็กหรือใหญ่เกินไป
     zoomLevel = Math.min(Math.max(0.5, zoomLevel), 5); 
     lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
 }, { passive: false });
 
-// ลากเมาส์เพื่อแพนรูป
 lightboxImg.addEventListener('mousedown', function(e) {
     e.preventDefault();
     isDraggingImg = true;
     startX = e.clientX - translateX;
     startY = e.clientY - translateY;
-    lightboxImg.style.transition = 'none'; // ปิดดีเลย์ตอนลาก เพื่อให้ภาพติดมือ
+    lightboxImg.style.transition = 'none'; 
     lightboxImg.style.cursor = 'grabbing';
 });
 
