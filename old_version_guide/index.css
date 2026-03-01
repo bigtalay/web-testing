@@ -96,7 +96,7 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
 .monster-image-large img:hover, .weakness-img:hover { transform: scale(1.02); }
 
 /* ========================================= */
-/* ✅ 1. เครื่องมือ Admin (โหมดข้างนอก) */
+/* ✅ 1. เครื่องมือ Admin (โหมดข้างนอก ธีมดาร์กทอง) */
 /* ========================================= */
 .admin-tools-container {
     position: fixed; bottom: 30px; right: 40px;
@@ -104,34 +104,48 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
     z-index: 9999;
 }
 .tool-btn {
-    width: 60px; height: 60px; border-radius: 50%; font-size: 25px; border: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6); cursor: pointer; transition: all 0.3s;
+    width: 55px; height: 55px; border-radius: 12px; 
+    background: linear-gradient(135deg, #333 0%, #111 100%);
+    color: #e3c16f; border: 2px solid #e3c16f;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    cursor: pointer; transition: all 0.3s ease;
     display: flex; justify-content: center; align-items: center;
 }
-.add-tool { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; }
-.edit-tool { background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%); color: white; }
-.delete-tool { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); color: white; }
-
-.tool-btn:hover { transform: scale(1.15); box-shadow: 0 6px 20px rgba(255,255,255,0.3); }
-.tool-btn.active-mode { transform: scale(1.2); outline: 3px solid #fff; box-shadow: 0 0 20px #fff; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { transform: scale(1.1); } 50% { transform: scale(1.25); } 100% { transform: scale(1.1); } }
+.tool-btn svg { transition: transform 0.3s ease; }
+.tool-btn:hover { 
+    background: #e3c16f; color: #111;
+    transform: scale(1.1) rotate(5deg); 
+    box-shadow: 0 6px 20px rgba(227, 193, 111, 0.6); 
+}
+.tool-btn.active-mode { 
+    background: #e3c16f; color: #111;
+    transform: scale(1.15); border-color: #fff; 
+    box-shadow: 0 0 20px rgba(227, 193, 111, 0.9); 
+    animation: pulse-mh 1.5s infinite; 
+}
+@keyframes pulse-mh { 
+    0% { box-shadow: 0 0 15px rgba(227, 193, 111, 0.5); transform: scale(1.15); } 
+    50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.8); transform: scale(1.25); } 
+    100% { box-shadow: 0 0 15px rgba(227, 193, 111, 0.5); transform: scale(1.15); } 
+}
 
 /* ✅ สไตล์ตอนการ์ดถูกเลือกให้ลบ หรือชี้เพื่อแก้ไข */
-body.edit-mode .monster-card:hover { border-color: #f1c40f; box-shadow: 0 10px 30px rgba(241, 196, 15, 0.6); cursor: cell; }
+body.edit-mode .monster-card:hover { border-color: #f1c40f; box-shadow: 0 10px 30px rgba(241, 196, 15, 0.6); cursor: pointer; }
 body.delete-mode .monster-card { cursor: crosshair; }
 body.delete-mode .monster-card:hover { border-color: #e74c3c; box-shadow: 0 10px 30px rgba(231, 76, 60, 0.6); }
 
-/* เมื่อการ์ดโดนคลิกเลือกให้ลบ จะมีขอบแดงและสัญลักษณ์กากบาท */
+/* เมื่อการ์ดโดนคลิกเลือกให้ลบ จะมีขอบแดงและสัญลักษณ์ล็อกเป้า */
 .monster-card.selected-for-delete {
     border-color: #e74c3c !important;
     transform: scale(0.95);
-    filter: grayscale(0.5);
+    filter: grayscale(0.4);
     box-shadow: inset 0 0 50px rgba(231, 76, 60, 0.8) !important;
 }
 .monster-card.selected-for-delete::after {
-    content: '🗑️ เลือกแล้ว'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 1.5rem; font-weight: bold; color: white; text-shadow: 2px 2px 5px black;
-    background: rgba(231, 76, 60, 0.9); padding: 10px 15px; border-radius: 10px; z-index: 10; pointer-events: none;
+    content: '🎯 ล็อกเป้า'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 1.5rem; font-weight: bold; color: #fff; text-shadow: 2px 2px 5px #000;
+    background: rgba(180, 0, 0, 0.85); padding: 10px 20px; border-radius: 8px; 
+    border: 2px solid #e74c3c; z-index: 10; pointer-events: none;
 }
 
 /* ========================================= */
@@ -139,22 +153,24 @@ body.delete-mode .monster-card:hover { border-color: #e74c3c; box-shadow: 0 10px
 /* ========================================= */
 .delete-action-bar {
     position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.9); border: 2px solid #e74c3c; border-radius: 30px;
+    background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); 
+    border: 2px solid #e3c16f; border-radius: 30px;
     padding: 15px 30px; display: flex; align-items: center; gap: 20px;
-    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4); z-index: 9998;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); z-index: 9998;
     transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .delete-action-bar.show { bottom: 30px; }
-#deleteCountText { color: white; font-size: 1.2rem; font-weight: bold; }
-.delete-action-bar .confirm { background: #e74c3c; border-color: #c0392b; color: white; }
+#deleteCountText { color: #e3c16f; font-size: 1.2rem; font-weight: bold; text-shadow: 0 2px 4px #000; }
+.delete-action-bar .confirm { background: #c0392b; border-color: #ff4d4d; color: white; }
 .delete-action-bar .confirm:hover { background: #ff4d4d; box-shadow: 0 0 15px #ff4d4d; color: white; }
-.delete-action-bar .cancel { background: #7f8c8d; border-color: #bdc3c7; color: white; }
+.delete-action-bar .cancel { background: transparent; border-color: #888; color: #ccc; }
+.delete-action-bar .cancel:hover { background: #444; color: #fff; border-color: #fff; }
 
 /* ========================================= */
 /* ✅ 3. หน้าจอเตือนแบบ Full Screen */
 /* ========================================= */
 .full-screen-delete {
-    background: rgba(150, 0, 0, 0.95) !important; /* แดงเข้มเต็มจอ */
+    background: rgba(120, 0, 0, 0.95) !important; /* แดงเข้มเต็มจอ */
     flex-direction: column; z-index: 100000;
 }
 .full-screen-delete-content { text-align: center; color: white; max-width: 800px; }
