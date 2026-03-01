@@ -111,8 +111,8 @@ body, html {
 .section.active .monster-grid { opacity: 1; transform: translateY(0); }
 
 .monster-card, .add-monster-card {
-    width: 100%; aspect-ratio: 2/3; height: 280;
-    background-color: black; /* ✅ เปลี่ยนเป็นสีดำสนิท */
+    width: 100%; aspect-ratio: 2/3; height: 280px;
+    background-color: black; 
     background-size:contain; background-position: center;
     border-radius: 15px; cursor: pointer; position: relative; overflow: hidden; background-repeat: no-repeat;
     border: 3px solid transparent; transition: transform 0.3s, box-shadow 0.3s;
@@ -157,9 +157,7 @@ body, html {
 .monster-image-large img { width: 100%; height: 350px; object-fit: cover; object-position: top center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .monster-info { flex: 2; min-width: 300px; }
 .info-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ccc; }
-.info-section p {
-    white-space: pre-line;
-}
+.info-section p { white-space: pre-line; }
 h2 { margin-top: 0; color: #5f4b8b; }
 .weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
@@ -312,4 +310,47 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
 }
 .monster-image-large img:hover, .weakness-img:hover {
     transform: scale(1.02);
+}
+
+/* --- ปุ่มเพิ่มมอนสเตอร์แบบลอย (Floating Button) --- */
+.floating-add-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 40px; /* วางไว้ขวาล่าง ไม่ให้ทับวงกลมจุดนำทาง */
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.floating-add-btn:hover {
+    transform: scale(1.15) rotate(90deg); /* ตอนชี้ให้หมุนนิดๆ เท่ๆ */
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.7);
+}
+
+/* --- โหมดช่องค้นหาลอยตามจอ (ทำงานเฉพาะตอนพิมพ์ค้นหา) --- */
+.search-container.is-searching {
+    position: fixed;
+    top: 100px; /* ลอยอยู่ด้านบนเหนือ Grid */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+    border-radius: 25px;
+    animation: popDown 0.3s ease forwards;
+}
+
+@keyframes popDown {
+    from { top: 0px; opacity: 0; }
+    to { top: 100px; opacity: 1; }
 }

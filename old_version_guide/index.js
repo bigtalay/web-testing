@@ -5,6 +5,8 @@ const container = document.getElementById('mainContainer');
 let sections = document.querySelectorAll('.section');
 const modal = document.getElementById('monsterModal');
 
+window.isAdminLoggedIn = false; 
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -23,28 +25,38 @@ const db = getFirestore(app);
 let monstersData = {};
 let allMonstersArray = []; 
 
+// ✅ เพิ่มระบบ Try-Catch ดักจับ Error จาก Firebase
 async function loadMonsters() {
-    const snapshot = await getDocs(collection(db, "monsters"));
-    allMonstersArray = [];
-    monstersData = {}; 
+    try {
+        const snapshot = await getDocs(collection(db, "monsters"));
+        allMonstersArray = [];
+        monstersData = {}; 
 
-    snapshot.forEach((doc) => {
-        const m = doc.data();
-        monstersData[doc.id] = m;
-        allMonstersArray.push({ type: 'monster', id: doc.id, data: m });
-    });
+        snapshot.forEach((doc) => {
+            const m = doc.data();
+            monstersData[doc.id] = m;
+            allMonstersArray.push({ type: 'monster', id: doc.id, data: m });
+        });
 
-    allMonstersArray.sort((a, b) => {
-        const timeA = a.data.createdAt || 0; 
-        const timeB = b.data.createdAt || 0;
-        return timeA - timeB; 
-    });
+        allMonstersArray.sort((a, b) => {
+            const timeA = a.data.createdAt || 0; 
+            const timeB = b.data.createdAt || 0;
+            return timeA - timeB; 
+        });
 
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput && searchInput.value.trim() !== "") {
-        handleSearch(searchInput.value);
-    } else {
-        renderMonsterGrid(allMonstersArray);
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput && searchInput.value.trim() !== "") {
+            handleSearch(searchInput.value);
+        } else {
+            renderMonsterGrid(allMonstersArray);
+        }
+    } catch (error) {
+        console.error("Firebase Error: ", error);
+        alert("❌ เกิดข้อผิดพลาดในการดึงข้อมูลจาก Firebase:\n" + error.message);
+    } finally {
+        // ไม่ว่าจะดึงข้อมูลสำเร็จ หรือ ฐานข้อมูลพัง ก็ต้องปิดหน้า Loading
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) loadingScreen.style.display = 'none';
     }
 }
 
@@ -71,12 +83,15 @@ function renderCategory(items, baseSectionId, titleText, category) {
     targetGrid.innerHTML = '';
 
     let allItems = [...items];
-    allItems.push({ type: 'add_button', id: `add-btn-${category}`, category: category });
-
     const itemsPerPage = 12;
     const pages = [];
-    for (let i = 0; i < allItems.length; i += itemsPerPage) {
-        pages.push(allItems.slice(i, i + itemsPerPage));
+    
+    if (allItems.length === 0) {
+        pages.push([]); 
+    } else {
+        for (let i = 0; i < allItems.length; i += itemsPerPage) {
+            pages.push(allItems.slice(i, i + itemsPerPage));
+        }
     }
 
     let previousNode = baseSec;
@@ -110,113 +125,115 @@ function renderCategory(items, baseSectionId, titleText, category) {
         const book = document.getElementById('bookContent');
 
         pageItems.forEach(item => {
-            if (item.type === 'add_button') {
-                const addCardHTML = `<div class="add-monster-card admin-only" onclick="openAddModal('${item.category}')"><div class="add-icon">+</div></div>`;
-                currentGrid.insertAdjacentHTML('beforeend', addCardHTML);
-            } else {
-                const m = item.data;
-                const id = item.id;
+            const m = item.data;
+            const id = item.id;
 
-                const cardHTML = `
-                    <div class="monster-card" id="card-${id}" style="background-image: url('${m.thumbnail}');">
-                        <div class="monster-name-tag">${m.name}</div>
-                    </div>
-                `;
-                currentGrid.insertAdjacentHTML('beforeend', cardHTML);
+            const cardHTML = `
+                <div class="monster-card" id="card-${id}" style="background-image: url('${m.thumbnail}');">
+                    <div class="monster-name-tag">${m.name}</div>
+                </div>
+            `;
+            currentGrid.insertAdjacentHTML('beforeend', cardHTML);
 
-                currentGrid.lastElementChild.addEventListener('click', () => {
-                    openModal(id);
-                });
+            currentGrid.lastElementChild.addEventListener('click', () => {
+                openModal(id);
+            });
 
-                if (!document.getElementById(`content-${id}`)) {
-                    // ⚠️ เพิ่มการแสดงผลข้อมูลใหม่ (Species, Habitats, Ailments) ตรงนี้
-                    const pageHTML = `
-                        <div id="content-${id}" class="monster-detail-layout" style="display: none;">
-                            <div class="monster-image-large">
-                                <img src="${m.detailImage}" alt="${m.name}" />
-                                <div class="delete-section admin-only">
-                                    <div class="delete-confirm" id="confirm-${id}">
-                                        <div class="confirm-text">แน่ใจไหมว่าจะลบ</div>
-                                        <div class="confirm-actions">
-                                            <button class="btn-yes" onclick="deleteMonster('${id}')">ใช่</button>
-                                            <button class="btn-no" onclick="toggleDeleteConfirm('${id}')">ไม่</button>
-                                        </div>
+            if (!document.getElementById(`content-${id}`)) {
+                const pageHTML = `
+                    <div id="content-${id}" class="monster-detail-layout" style="display: none;">
+                        <div class="monster-image-large">
+                            <img src="${m.detailImage}" alt="${m.name}" onclick="openLightbox(this.src)" />
+                            <div class="delete-section admin-only">
+                                <div class="delete-confirm" id="confirm-${id}">
+                                    <div class="confirm-text">แน่ใจไหมว่าจะลบ</div>
+                                    <div class="confirm-actions">
+                                        <button class="btn-yes" onclick="deleteMonster('${id}')">ใช่</button>
+                                        <button class="btn-no" onclick="toggleDeleteConfirm('${id}')">ไม่</button>
                                     </div>
-                                    <button class="delete-btn" onclick="toggleDeleteConfirm('${id}')" title="ลบมอนสเตอร์">
-                                        <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                                        </svg>
-                                    </button>
-                                    <button class="edit-btn" onclick="openEditModal('${id}')" title="แก้ไขข้อมูล">
-                                        <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                                        </svg>
-                                    </button>
                                 </div>
-                            </div>
-                            <div class="monster-info">
-                                <h2>${m.name}</h2>
-                                <div class="info-section">
-                                    <h3>General Info</h3>
-                                    <p style="margin-bottom: 5px;"><strong>🦖 ประเภท (Species):</strong> ${m.species || 'ไม่ระบุ'}</p>
-                                    <p style="margin-bottom: 5px;"><strong>📍 สถานที่พบ (Habitats):</strong> ${m.habitats || 'ไม่ระบุ'}</p>
-                                    <p style="margin-bottom: 15px;"><strong>☠️ สถานะผิดปกติ (Ailments):</strong> ${m.ailments || 'ไม่มี'}</p>
-                                    <p>${m.description}</p>
-                                </div>
-                                <div class="info-section">
-                                    <h3>Weakness</h3>
-                                    <p>${m.weaknessText}</p>
-                                    ${m.weaknessChart ? `<img src="${m.weaknessChart}" class="weakness-img">` : ''}
-                                </div>
+                                <button class="delete-btn" onclick="toggleDeleteConfirm('${id}')" title="ลบมอนสเตอร์">
+                                    <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
+                                <button class="edit-btn" onclick="openEditModal('${id}')" title="แก้ไขข้อมูล">
+                                    <svg viewBox="0 0 24 24" width="35" height="35" stroke="#3e2723" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-                    `;
-                    book.insertAdjacentHTML('beforeend', pageHTML);
-                }
+                        <div class="monster-info">
+                            <h2>${m.name}</h2>
+                            <div class="info-section">
+                                <h3>General Info</h3>
+                                <p style="margin-bottom: 5px;"><strong>🦖 ประเภท (Species):</strong> ${m.species || 'ไม่ระบุ'}</p>
+                                <p style="margin-bottom: 5px;"><strong>📍 สถานที่พบ (Habitats):</strong> ${m.habitats || 'ไม่ระบุ'}</p>
+                                <p style="margin-bottom: 15px;"><strong>☠️ สถานะผิดปกติ (Ailments):</strong> ${m.ailments || 'ไม่มี'}</p>
+                                <p>${m.description}</p>
+                            </div>
+                            <div class="info-section">
+                                <h3>Weakness</h3>
+                                <p>${m.weaknessText}</p>
+                                ${m.weaknessChart ? `<img src="${m.weaknessChart}" class="weakness-img" onclick="openLightbox(this.src)">` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                book.insertAdjacentHTML('beforeend', pageHTML);
             }
         });
     });
 }
 
+// ✅ ระบบค้นหาและเลื่อนหน้าจออัตโนมัติ (พร้อมช่องค้นหาลอยตามจอ)
 window.handleSearch = function(searchTerm) {
     const term = searchTerm.toLowerCase().trim();
     let filtered = [];
     
+    // ดึงกล่องค้นหามาเพื่อสั่งให้มันลอย
+    const searchContainer = document.querySelector('.search-container');
+
     if (term === "") {
         filtered = allMonstersArray;
+        // ถ้าช่องค้นหาว่างเปล่า ให้เอาคลาสลอยออก (กลับไปแปะที่ภาค World เหมือนเดิม)
+        if (searchContainer) searchContainer.classList.remove('is-searching');
     } else {
         filtered = allMonstersArray.filter(item => 
             item.data.name.toLowerCase().includes(term)
         );
-    }
-    
-    if (currentSection > 1) {
-        scrollToSection(1);
+        // ถ้ากำลังพิมพ์ค้นหาอยู่ ให้เติมคลาสเพื่อให้กล่องค้นหาลอยตามจอ
+        if (searchContainer) searchContainer.classList.add('is-searching');
     }
     
     renderMonsterGrid(filtered);
-}
 
-function updateNavigation() {
-    sections = document.querySelectorAll('.section, .dynamic-page'); 
-    totalSections = sections.length;
-    const dotContainer = document.querySelector('.nav-dots');
-    if(dotContainer) {
-        dotContainer.innerHTML = ''; 
-        sections.forEach((_, index) => {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (index === currentSection) dot.classList.add('active');
-            dot.addEventListener('click', () => scrollToSection(index));
-            dotContainer.appendChild(dot);
-        });
+    // ระบบสไลด์หน้าจอ
+    if (term === "") {
+        scrollToSection(1);
+    } else {
+        const hasWorld = filtered.some(m => m.data.category !== 'iceborne');
+        const hasIceborne = filtered.some(m => m.data.category === 'iceborne');
+
+        if (!hasWorld && hasIceborne) {
+            const sectionsArray = Array.from(document.querySelectorAll('.section, .dynamic-page'));
+            const iceborneIndex = sectionsArray.findIndex(sec => sec.id === 'sec-iceborne' || sec.classList.contains('dynamic-page-iceborne'));
+            if (iceborneIndex !== -1) {
+                scrollToSection(iceborneIndex);
+            }
+        } else if (hasWorld) {
+            const sectionsArray = Array.from(document.querySelectorAll('.section, .dynamic-page'));
+            const worldIndex = sectionsArray.findIndex(sec => sec.id === 'sec-world' || sec.classList.contains('dynamic-page-world'));
+            if (worldIndex !== -1) {
+                scrollToSection(worldIndex);
+            }
+        }
     }
 }
-
-loadMonsters(); 
 
 function scrollToSection(index) {
     if (index < 0 || index >= totalSections) return;
@@ -263,9 +280,16 @@ modal.addEventListener('click', (e) => {
 });
 window.closeModal = closeModal;
 
-window.openAddModal = function(category) { 
+window.openAddModal = function() { 
     const catSelect = document.getElementById('newCategory');
-    if(catSelect && category) { catSelect.value = category; }
+    if(catSelect) { 
+        const activeSection = document.querySelectorAll('.section, .dynamic-page')[currentSection];
+        if (activeSection && (activeSection.id === 'sec-iceborne' || activeSection.classList.contains('dynamic-page-iceborne'))) {
+            catSelect.value = 'iceborne';
+        } else {
+            catSelect.value = 'world';
+        }
+    }
     document.getElementById('addMonsterModal').classList.add('show'); 
 }
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
@@ -276,12 +300,9 @@ window.openEditModal = function(id) {
         document.getElementById('editMonsterId').value = id;
         document.getElementById('editCategory').value = m.category || 'world';
         document.getElementById('editName').value = m.name;
-        
-        // ดึงข้อมูลใหม่มาแสดงตอนแก้ไข
         document.getElementById('editSpecies').value = m.species || '';
         document.getElementById('editHabitats').value = m.habitats || '';
         document.getElementById('editAilments').value = m.ailments || '';
-
         document.getElementById('editDescription').value = m.description;
         document.getElementById('editWeaknessText').value = m.weaknessText;
         document.getElementById('editMonsterModal').classList.add('show');
@@ -327,10 +348,8 @@ function convertFileToBase64(fileInput) {
                 canvas.height = height;
                 const ctx = canvas.getContext("2d");
 
-                // ไม่ต้องเทสีขาวทับแล้ว ให้มันทะลุเหมือนเดิม
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // ✅ เปลี่ยนจากการแปลงเป็น jpeg มาเป็น webp (รองรับโปร่งใสและขนาดไฟล์เล็ก)
                 const webpBase64 = canvas.toDataURL("image/webp", 0.8);
                 resolve(webpBase64);
             };
@@ -355,12 +374,9 @@ document.getElementById('addMonsterForm').addEventListener('submit', async (e) =
         const newMonsterData = {
             category: document.getElementById('newCategory').value,
             name: document.getElementById('newName').value,
-            
-            // ส่งข้อมูล 3 ตัวใหม่ขึ้น Firebase
             species: document.getElementById('newSpecies').value,
             habitats: document.getElementById('newHabitats').value,
             ailments: document.getElementById('newAilments').value,
-
             thumbnail: thumbnailBase64,
             detailImage: detailImageBase64,
             description: document.getElementById('newDescription').value,
@@ -389,22 +405,19 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
     btn.innerHTML = "⏳ กำลังอัปเดต..."; btn.disabled = true;
     
     const id = document.getElementById('editMonsterId').value;
-    const m = monstersData[id]; // ข้อมูลเดิมจาก Firebase ที่โหลดไว้ตอนแรก
+    const m = monstersData[id]; 
     
     try {
-        // เช็ค Thumbnail: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.thumbnail (ของเดิม)
         let finalThumbnail = m.thumbnail;
         if(document.getElementById('editThumbnail').files.length > 0) {
             finalThumbnail = await convertFileToBase64(document.getElementById('editThumbnail'));
         }
 
-        // เช็ค Detail Image: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.detailImage (ของเดิม)
         let finalDetailImage = m.detailImage;
         if(document.getElementById('editDetailImage').files.length > 0) {
             finalDetailImage = await convertFileToBase64(document.getElementById('editDetailImage'));
         }
 
-        // เช็ค Weakness Chart: ถ้าไม่ได้เลือกใหม่ ให้ใช้ m.weaknessChart (ของเดิม)
         let finalWeaknessChart = m.weaknessChart || "";
         if(document.getElementById('editWeaknessChart').files.length > 0) {
             finalWeaknessChart = await convertFileToBase64(document.getElementById('editWeaknessChart'));
@@ -416,7 +429,7 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
             species: document.getElementById('editSpecies').value,
             habitats: document.getElementById('editHabitats').value,
             ailments: document.getElementById('editAilments').value,
-            thumbnail: finalThumbnail, // ส่งรูป (ใหม่หรือเก่า) กลับไป
+            thumbnail: finalThumbnail, 
             detailImage: finalDetailImage,
             description: document.getElementById('editDescription').value,
             weaknessText: document.getElementById('editWeaknessText').value,
@@ -427,7 +440,7 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
         alert("✅ แก้ไขเรียบร้อย!");
         closeEditModal(); 
         closeModal(); 
-        loadMonsters(); // โหลดหน้าเว็บใหม่เพื่ออัปเดตข้อมูลล่าสุด
+        loadMonsters(); 
     } catch (error) { 
         console.error(error);
         alert("❌ เกิดข้อผิดพลาด: " + error.message); 
@@ -534,6 +547,7 @@ window.handleSuccessfulLogin = function() {
     document.getElementById('btn-logout').style.display = 'flex'; 
     document.body.classList.add('admin-logged-in');
     window.isAdminLoggedIn = true; 
+    renderMonsterGrid(allMonstersArray); 
 }
 
 window.logoutAdmin = function() {
@@ -541,6 +555,7 @@ window.logoutAdmin = function() {
     document.getElementById('btn-login').style.display = 'flex'; 
     document.body.classList.remove('admin-logged-in');
     window.isAdminLoggedIn = false;
+    renderMonsterGrid(allMonstersArray); 
     alert("Logged out successfully.");
 }
 
@@ -564,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ฟังก์ชันสำหรับเปิดรูปใหญ่
 window.openLightbox = function(src) {
     const lightbox = document.getElementById('imageLightbox');
     const img = document.getElementById('lightboxImg');
@@ -572,7 +586,24 @@ window.openLightbox = function(src) {
     lightbox.style.display = 'flex';
 }
 
-// ฟังก์ชันสำหรับปิดรูปใหญ่
 window.closeLightbox = function() {
     document.getElementById('imageLightbox').style.display = 'none';
 }
+
+function updateNavigation() {
+    sections = document.querySelectorAll('.section, .dynamic-page'); 
+    totalSections = sections.length;
+    const dotContainer = document.querySelector('.nav-dots');
+    if(dotContainer) {
+        dotContainer.innerHTML = ''; 
+        sections.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === currentSection) dot.classList.add('active');
+            dot.addEventListener('click', () => scrollToSection(index));
+            dotContainer.appendChild(dot);
+        });
+    }
+}
+
+loadMonsters();
