@@ -6,8 +6,8 @@ let sections = document.querySelectorAll('.section');
 const modal = document.getElementById('monsterModal');
 
 window.isAdminLoggedIn = false; 
-window.adminMode = 'normal'; // 'normal', 'edit', 'delete'
-window.selectedForDelete = []; // อาเรย์เก็บมอนสเตอร์ที่เตรียมจะลบ
+window.adminMode = 'normal'; 
+window.selectedForDelete = []; 
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { initializeFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -103,7 +103,6 @@ function renderCategory(items, baseSectionId, titleText, category) {
         pageItems.forEach(item => {
             const m = item.data; const id = item.id;
             
-            // วาดรูปการ์ด
             const cardHTML = `
                 <div class="monster-card ${window.selectedForDelete.includes(id) ? 'selected-for-delete' : ''}" id="card-${id}" style="background-image: url('${m.thumbnail}');">
                     <div class="monster-name-tag">${m.name}</div>
@@ -111,19 +110,17 @@ function renderCategory(items, baseSectionId, titleText, category) {
             `;
             currentGrid.insertAdjacentHTML('beforeend', cardHTML);
 
-            // ✅ ระบบควบคุมการคลิกของการ์ดตาม Mode
             const cardEl = currentGrid.lastElementChild;
             cardEl.addEventListener('click', () => {
                 if (window.adminMode === 'edit') {
-                    openEditModal(id); // เข้าโหมดแก้ไข
+                    openEditModal(id); 
                 } else if (window.adminMode === 'delete') {
-                    toggleMonsterSelection(id, cardEl); // เข้าโหมดเลือกเพื่อลบ
+                    toggleMonsterSelection(id, cardEl); 
                 } else {
-                    openModal(id); // โหมดปกติ: เปิดสมุดมอนสเตอร์
+                    openModal(id); 
                 }
             });
 
-            // วาดเนื้อหาในสมุดมอนสเตอร์ (เอาปุ่มลบ/แก้ไขเก่าออกหมดแล้วตามสั่งอาจารย์)
             if (!document.getElementById(`content-${id}`)) {
                 const pageHTML = `
                     <div id="content-${id}" class="monster-detail-layout" style="display: none;">
@@ -153,21 +150,17 @@ function renderCategory(items, baseSectionId, titleText, category) {
     });
 }
 
-// ✅ ระบบจัดการ Mode ต่างๆ ของ Admin (เข้า/ออกโหมด แก้ไข หรือ ลบ)
 window.toggleMode = function(mode) {
     if (!window.isAdminLoggedIn) return;
 
-    // Reset สไตล์ต่างๆ ก่อน
     document.querySelector('.edit-tool').classList.remove('active-mode');
     document.querySelector('.delete-tool').classList.remove('active-mode');
     document.body.classList.remove('edit-mode', 'delete-mode');
     document.getElementById('deleteActionBar').classList.remove('show');
     
-    // เคลียร์ค่าที่เลือกไว้เวลาสลับโหมด
     window.selectedForDelete = []; 
     document.querySelectorAll('.monster-card').forEach(card => card.classList.remove('selected-for-delete'));
 
-    // ถ้ากดปุ่มเดิมซ้ำ ให้กลับไปโหมดปกติ
     if (window.adminMode === mode) {
         window.adminMode = 'normal';
         return;
@@ -186,15 +179,12 @@ window.toggleMode = function(mode) {
     }
 }
 
-// ✅ ระบบเลือกมอนสเตอร์ (เวลาอยู่โหมดลบ)
 window.toggleMonsterSelection = function(id, cardEl) {
     const index = window.selectedForDelete.indexOf(id);
     if (index > -1) {
-        // เอาออกถ้ามีอยู่แล้ว
         window.selectedForDelete.splice(index, 1);
         cardEl.classList.remove('selected-for-delete');
     } else {
-        // เลือกเพิ่ม
         window.selectedForDelete.push(id);
         cardEl.classList.add('selected-for-delete');
     }
@@ -215,14 +205,12 @@ function updateDeleteCount() {
     }
 }
 
-// ✅ ระบบแจ้งเตือนลบใหญ่เต็มจอ 
 window.openFullScreenDeleteConfirm = function() {
     if (window.selectedForDelete.length === 0) return;
     
     const listEl = document.getElementById('deleteNamesList');
     listEl.innerHTML = '';
     
-    // ดึงรายชื่อมาแสดงให้ดู
     window.selectedForDelete.forEach(id => {
         const mName = monstersData[id].name;
         listEl.innerHTML += `<div>- ${mName}</div>`;
@@ -234,7 +222,6 @@ window.closeFullScreenDeleteConfirm = function() {
     document.getElementById('fullScreenDeleteModal').classList.remove('show');
 }
 
-// ✅ ดำเนินการลบจริงๆ เข้า Firebase ทีละตัวๆ
 window.executeMassDelete = async function() {
     if (window.selectedForDelete.length === 0) return;
     
@@ -243,13 +230,11 @@ window.executeMassDelete = async function() {
     btn.disabled = true;
 
     try {
-        // ลูปเพื่อสั่งลบทีละ ID
         for (let i = 0; i < window.selectedForDelete.length; i++) {
             await deleteDoc(doc(db, "monsters", window.selectedForDelete[i]));
         }
         alert("✅ ลบข้อมูลสำเร็จเรียบร้อย!");
         
-        // เคลียร์โหมด กลับสู่ปกติ
         closeFullScreenDeleteConfirm();
         toggleMode('normal');
         loadMonsters();
@@ -262,7 +247,6 @@ window.executeMassDelete = async function() {
     }
 }
 
-// ================= ระบบค้นหาและสไลด์หน้าจอ =================
 window.handleSearch = function(searchTerm) {
     try {
         const term = searchTerm.toLowerCase().trim();
@@ -286,7 +270,6 @@ window.handleSearch = function(searchTerm) {
         
         renderMonsterGrid(filtered);
 
-        // ถ้าอยู่ในโหมดลบ แล้วค้นหา ให้ตัวที่ถูกเลือกไว้ยังติดแดงอยู่
         if (window.adminMode === 'delete') {
             window.selectedForDelete.forEach(id => {
                 const card = document.getElementById(`card-${id}`);
@@ -321,6 +304,16 @@ window.handleSearch = function(searchTerm) {
     }
 }
 
+// ================= ระบบหยุดการเลื่อนจอเมื่อเปิด Popup =================
+function isModalOpen() {
+    const lb = document.getElementById('imageLightbox');
+    return modal.classList.contains('show') || 
+        document.getElementById('addMonsterModal').classList.contains('show') || 
+        document.getElementById('editMonsterModal').classList.contains('show') || 
+        document.getElementById('fullScreenDeleteModal').classList.contains('show') ||
+        (lb && lb.style.display === 'flex');
+}
+
 function scrollToSection(index) {
     if (index < 0 || index >= totalSections) return;
     currentSection = index;
@@ -336,21 +329,20 @@ function scrollToSection(index) {
 window.scrollToSection = scrollToSection;
 
 window.addEventListener('wheel', (e) => {
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show') || document.getElementById('fullScreenDeleteModal').classList.contains('show')) return;
+    if (isModalOpen()) return;
     if (isScrolling) return;
     if (e.deltaY > 0) scrollToSection(currentSection + 1);
     else scrollToSection(currentSection - 1);
 });
 
 window.addEventListener('keydown', (e) => {
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show') || document.getElementById('fullScreenDeleteModal').classList.contains('show')) return;
+    if (isModalOpen()) return;
     if (document.activeElement === document.getElementById('searchInput')) return;
     if (isScrolling) return;
     if (e.key === 'ArrowDown') scrollToSection(currentSection + 1);
     if (e.key === 'ArrowUp') scrollToSection(currentSection - 1);
 });
 
-// ================= ระบบ Modals ต่างๆ =================
 function openModal(monsterId) {
     modal.classList.add('show');
     const allContents = document.querySelectorAll('.monster-detail-layout');
@@ -363,9 +355,7 @@ modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }
 window.closeModal = closeModal;
 
 window.openAddModal = function() { 
-    // กดปุ่มเพิ่ม ก็ให้ปิดโหมดอื่นๆ ก่อน
     toggleMode('normal');
-    
     const catSelect = document.getElementById('newCategory');
     if(catSelect) { 
         const activeSection = document.querySelectorAll('.section, .dynamic-page')[currentSection];
@@ -392,13 +382,12 @@ window.openEditModal = function(id) {
 }
 window.closeEditModal = function() { 
     document.getElementById('editMonsterModal').classList.remove('show'); 
-    toggleMode('normal'); // แก้ไขเสร็จ/ปิด คืนสู่โหมดปกติ
+    toggleMode('normal'); 
 }
 document.getElementById('editMonsterModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('editMonsterModal')) closeEditModal();
 });
 
-// ================= ระบบเชื่อมต่อ ImgBB และ Firebase =================
 async function uploadToImgBB(fileInput) {
     const file = fileInput.files[0];
     if (!file) return ""; 
@@ -479,7 +468,6 @@ document.getElementById('editMonsterForm').addEventListener('submit', async (e) 
     } finally { submitBtn.innerText = "บันทึกการแก้ไข"; submitBtn.disabled = false; }
 });
 
-// ================= ระบบเครื่องเล่นเพลง Youtube =================
 var tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player; var isMuted = true;
@@ -491,23 +479,21 @@ document.addEventListener('click', function(e) {
 }, { once: true });
 window.toggleMute = function() { const btn = document.getElementById("muteBtn"); if (!player) return; if (isMuted) { player.unMute(); btn.innerHTML = "🔊 Mute Music"; isMuted = false; } else { player.mute(); btn.innerHTML = "🔇 Unmute Music"; isMuted = true; } }
 
-// ================= ระบบกวาดนิ้วสัมผัส =================
 let touchStartY = 0; let touchEndY = 0;
-window.addEventListener('touchmove', e => { if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show') || document.getElementById('fullScreenDeleteModal').classList.contains('show')) { return; } e.preventDefault(); }, { passive: false }); 
+window.addEventListener('touchmove', e => { if (isModalOpen()) { return; } e.preventDefault(); }, { passive: false }); 
 window.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, { passive: true });
 window.addEventListener('touchend', e => {
-    if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show') || document.getElementById('fullScreenDeleteModal').classList.contains('show')) return;
+    if (isModalOpen()) return;
     if (isScrolling) return; touchEndY = e.changedTouches[0].screenY; handleSwipe();
 });
 function handleSwipe() { const swipeThreshold = 50; if (touchStartY - touchEndY > swipeThreshold) { scrollToSection(currentSection + 1); } else if (touchEndY - touchStartY > swipeThreshold) { scrollToSection(currentSection - 1); } }
 
-// ================= ระบบ Login Admin =================
 window.openLoginModal = function() { const modal = document.getElementById('login-modal'); if (modal) modal.style.display = 'flex'; }
 window.closeLoginModal = function() { const modal = document.getElementById('login-modal'); if (modal) modal.style.display = 'none'; }
 window.handleSuccessfulLogin = function() { document.getElementById('btn-login').style.display = 'none'; document.getElementById('btn-logout').style.display = 'flex'; document.body.classList.add('admin-logged-in'); window.isAdminLoggedIn = true; renderMonsterGrid(allMonstersArray); }
 window.logoutAdmin = function() { 
     document.getElementById('btn-logout').style.display = 'none'; document.getElementById('btn-login').style.display = 'flex'; document.body.classList.remove('admin-logged-in'); window.isAdminLoggedIn = false; 
-    toggleMode('normal'); // ยกเลิกโหมดต่างๆ เมื่อล็อคเอาท์
+    toggleMode('normal'); 
     renderMonsterGrid(allMonstersArray); 
     alert("Logged out successfully."); 
 }
@@ -524,9 +510,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ================= ระบบ Lightbox =================
-window.openLightbox = function(src) { const lightbox = document.getElementById('imageLightbox'); const img = document.getElementById('lightboxImg'); img.src = src; lightbox.style.display = 'flex'; }
-window.closeLightbox = function() { document.getElementById('imageLightbox').style.display = 'none'; }
+// ==========================================
+// ✅ ระบบ Lightbox ซูมและคลิกลากแพนภาพ
+// ==========================================
+let zoomLevel = 1;
+let isDraggingImg = false;
+let startX = 0, startY = 0, translateX = 0, translateY = 0;
+const lightboxOverlay = document.getElementById('imageLightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+
+window.openLightbox = function(src) { 
+    lightboxImg.src = src; 
+    lightboxOverlay.style.display = 'flex'; 
+    // รีเซ็ตค่าการซูมและตำแหน่งทุกครั้งที่เปิดใหม่
+    zoomLevel = 1;
+    translateX = 0;
+    translateY = 0;
+    lightboxImg.style.transform = `translate(0px, 0px) scale(1)`;
+    lightboxImg.style.transition = 'transform 0.3s ease'; // เด้งแบบนุ่มๆ
+}
+
+window.closeLightbox = function() { 
+    lightboxOverlay.style.display = 'none'; 
+}
+
+// กดที่พื้นหลังดำให้ปิดหน้าต่าง
+lightboxOverlay.addEventListener('click', function(e) {
+    if (e.target === lightboxOverlay) {
+        window.closeLightbox();
+    }
+});
+
+// ใช้ลูกกลิ้งเมาส์เพื่อซูม
+lightboxOverlay.addEventListener('wheel', function(e) {
+    if (lightboxOverlay.style.display !== 'flex') return;
+    e.preventDefault(); // ไม่ให้เผลอไปเลื่อนหน้าจอ
+    
+    lightboxImg.style.transition = 'transform 0.1s ease'; // ปรับความไวการซูมให้ลื่นไหล
+    
+    if (e.deltaY < 0) {
+        zoomLevel += 0.15; // เลื่อนขึ้น = ซูมเข้า
+    } else {
+        zoomLevel -= 0.15; // เลื่อนลง = ซูมออก
+    }
+    
+    // ล็อกระยะการซูมไม่ให้เล็กหรือใหญ่เกินไป
+    zoomLevel = Math.min(Math.max(0.5, zoomLevel), 5); 
+    lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
+}, { passive: false });
+
+// ลากเมาส์เพื่อแพนรูป
+lightboxImg.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    isDraggingImg = true;
+    startX = e.clientX - translateX;
+    startY = e.clientY - translateY;
+    lightboxImg.style.transition = 'none'; // ปิดดีเลย์ตอนลาก เพื่อให้ภาพติดมือ
+    lightboxImg.style.cursor = 'grabbing';
+});
+
+window.addEventListener('mousemove', function(e) {
+    if (!isDraggingImg) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
+});
+
+window.addEventListener('mouseup', function() {
+    if (isDraggingImg) {
+        isDraggingImg = false;
+        lightboxImg.style.cursor = 'grab';
+    }
+});
 
 function updateNavigation() {
     sections = document.querySelectorAll('.section, .dynamic-page'); totalSections = sections.length;
