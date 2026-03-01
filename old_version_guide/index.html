@@ -22,11 +22,7 @@
 
     <img src="Logo.png" alt="MHW Logo" class="top-left-logo" />
 
-    <button
-      id="btn-login"
-      class="admin-top-right-btn"
-      onclick="openLoginModal()"
-    >
+    <button id="btn-login" class="admin-top-right-btn" onclick="openLoginModal()">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
         <polyline points="10 17 15 12 10 7"></polyline>
@@ -35,12 +31,7 @@
       Admin
     </button>
 
-    <button
-      id="btn-logout"
-      class="admin-top-right-btn logout-variant"
-      onclick="logoutAdmin()"
-      style="display: none"
-    >
+    <button id="btn-logout" class="admin-top-right-btn logout-variant" onclick="logoutAdmin()" style="display: none">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
         <polyline points="16 17 21 12 16 7"></polyline>
@@ -53,17 +44,11 @@
       <div class="section sec1 active">
         <div class="hero-content">
           <h1 class="hero-title">WELCOME HUNTER</h1>
-          <p class="hero-subtitle">
-            รวบรวมเนื้อหาข้อมูลมอนสเตอร์
-            เพื่อให้มือใหม่และมือฉมังมาเปิดดูวิธีสู้และจุดอ่อน
-          </p>
+          <p class="hero-subtitle">รวบรวมเนื้อหาข้อมูลมอนสเตอร์ เพื่อให้มือใหม่และมือฉมังมาเปิดดูวิธีสู้และจุดอ่อน</p>
           <div class="hero-buttons">
-            <button class="primary-btn" onclick="scrollToSection(1)">
-              ดูรายชื่อมอนสเตอร์ (MONSTER LIST)
-            </button>
+            <button class="primary-btn" onclick="scrollToSection(1)">ดูรายชื่อมอนสเตอร์ (MONSTER LIST)</button>
           </div>
         </div>
-
         <div class="scroll-down" onclick="scrollToSection(1)">
           <span class="scroll-text">เลื่อนลงเพื่อดูเนื้อหา monster</span>
           <div class="arrow"></div>
@@ -73,12 +58,7 @@
       <div class="section sec2" id="sec-world">
         <h1 class="monster-list-title">Monster List (World)</h1>
         <div class="search-container">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="🔍 ค้นหาชื่อมอนสเตอร์ทั้งหมด (เช่น Rathalos)..."
-            onkeyup="handleSearch(this.value)"
-          />
+          <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่อมอนสเตอร์ทั้งหมด (เช่น Rathalos)..." onkeyup="handleSearch(this.value)" />
         </div>
         <div class="monster-grid" id="grid-world"></div>
       </div>
@@ -113,42 +93,15 @@
                 <option value="iceborne">ภาค Iceborne (พื้นหลังหิมะ)</option>
               </select>
             </div>
-            <div class="input-group">
-              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input type="text" id="newName" placeholder="เช่น Great Jagras" required />
-            </div>
-            <div class="input-group">
-              <label>2. ประเภท (Species):</label>
-              <input type="text" id="newSpecies" placeholder="เช่น Fanged Wyvern, Elder Dragon" required />
-            </div>
-            <div class="input-group">
-              <label>3. สถานที่พบ (Habitats):</label>
-              <textarea id="newHabitats" rows="2" placeholder="เช่น Ancient Forest&#10;Wildspire Waste" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>4. สถานะผิดปกติ (Ailments Inflicted):</label>
-              <textarea id="newAilments" rows="2" placeholder="เช่น พ่นไฟ (Fireblight)&#10;ติดพิษ (Poison)" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>5. รูปปก Icon (อัพโหลดรูปภาพ):</label>
-              <input type="file" id="newThumbnail" accept="image/*" required />
-            </div>
-            <div class="input-group">
-              <label>6. รูปภาพมอนสเตอร์ (อัพโหลดรูปภาพ):</label>
-              <input type="file" id="newDetailImage" accept="image/*" required />
-            </div>
-            <div class="input-group">
-              <label>7. รายละเอียด (General Info):</label>
-              <textarea id="newDescription" rows="4" placeholder="ข้อมูลทั่วไปของมอนสเตอร์..." required></textarea>
-            </div>
-            <div class="input-group">
-              <label>8. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <textarea id="newWeaknessText" rows="3" placeholder="เช่น แพ้ไฟ (Fire) ⭐️⭐️⭐️" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>9. รูปภาพบอกจุดอ่อน (อัพโหลดรูปภาพ):</label>
-              <input type="file" id="newWeaknessChart" accept="image/*" />
-            </div>
+            <div class="input-group"><label>1. ชื่อมอนสเตอร์ (Monster Name):</label><input type="text" id="newName" required /></div>
+            <div class="input-group"><label>2. ประเภท (Species):</label><input type="text" id="newSpecies" required /></div>
+            <div class="input-group"><label>3. สถานที่พบ (Habitats):</label><textarea id="newHabitats" rows="2" required></textarea></div>
+            <div class="input-group"><label>4. สถานะผิดปกติ (Ailments):</label><textarea id="newAilments" rows="2" required></textarea></div>
+            <div class="input-group"><label>5. รูปปก Icon:</label><input type="file" id="newThumbnail" accept="image/*" required /></div>
+            <div class="input-group"><label>6. รูปภาพมอนสเตอร์:</label><input type="file" id="newDetailImage" accept="image/*" required /></div>
+            <div class="input-group"><label>7. รายละเอียด (Info):</label><textarea id="newDescription" rows="4" required></textarea></div>
+            <div class="input-group"><label>8. ข้อมูลจุดอ่อน:</label><textarea id="newWeaknessText" rows="3" required></textarea></div>
+            <div class="input-group"><label>9. รูปภาพบอกจุดอ่อน:</label><input type="file" id="newWeaknessChart" accept="image/*" /></div>
             <button type="submit" class="game-button submit-btn">บันทึกข้อมูลมอนสเตอร์</button>
           </form>
         </div>
@@ -165,49 +118,20 @@
             <div class="input-group">
               <label>หมวดหมู่ภาค (Category):</label>
               <select id="editCategory" required>
-                <option value="world">ภาค World (พื้นหลังป่า)</option>
-                <option value="iceborne">ภาค Iceborne (พื้นหลังหิมะ)</option>
+                <option value="world">ภาค World</option>
+                <option value="iceborne">ภาค Iceborne</option>
               </select>
             </div>
-            <div class="input-group">
-              <label>1. ชื่อมอนสเตอร์ (Monster Name):</label>
-              <input type="text" id="editName" required />
-            </div>
-            <div class="input-group">
-              <label>2. ประเภท (Species):</label>
-              <input type="text" id="editSpecies" required />
-            </div>
-            <div class="input-group">
-              <label>3. สถานที่พบ (Habitats):</label>
-              <textarea id="editHabitats" rows="2" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>4. สถานะผิดปกติ (Ailments Inflicted):</label>
-              <textarea id="editAilments" rows="2" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>5. รูปปก Icon (เว้นว่างถ้าใช้รูปเดิม):</label>
-              <input type="file" id="editThumbnail" accept="image/*" />
-            </div>
-            <div class="input-group">
-              <label>6. รูปภาพมอนสเตอร์ (เว้นว่างถ้าใช้รูปเดิม):</label>
-              <input type="file" id="editDetailImage" accept="image/*" />
-            </div>
-            <div class="input-group">
-              <label>7. รายละเอียด (General Info):</label>
-              <textarea id="editDescription" rows="4" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>8. ข้อมูลจุดอ่อน (Weakness Text):</label>
-              <textarea id="editWeaknessText" rows="3" required></textarea>
-            </div>
-            <div class="input-group">
-              <label>9. รูปภาพบอกจุดอ่อน (เว้นว่างถ้าใช้รูปเดิม):</label>
-              <input type="file" id="editWeaknessChart" accept="image/*" />
-            </div>
-            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">
-              บันทึกการแก้ไข
-            </button>
+            <div class="input-group"><label>1. ชื่อมอนสเตอร์:</label><input type="text" id="editName" required /></div>
+            <div class="input-group"><label>2. ประเภท:</label><input type="text" id="editSpecies" required /></div>
+            <div class="input-group"><label>3. สถานที่พบ:</label><textarea id="editHabitats" rows="2" required></textarea></div>
+            <div class="input-group"><label>4. สถานะผิดปกติ:</label><textarea id="editAilments" rows="2" required></textarea></div>
+            <div class="input-group"><label>5. รูปปก Icon (เว้นว่างถ้าใช้รูปเดิม):</label><input type="file" id="editThumbnail" accept="image/*" /></div>
+            <div class="input-group"><label>6. รูปภาพมอนสเตอร์ (เว้นว่างถ้าใช้รูปเดิม):</label><input type="file" id="editDetailImage" accept="image/*" /></div>
+            <div class="input-group"><label>7. รายละเอียด:</label><textarea id="editDescription" rows="4" required></textarea></div>
+            <div class="input-group"><label>8. ข้อมูลจุดอ่อน:</label><textarea id="editWeaknessText" rows="3" required></textarea></div>
+            <div class="input-group"><label>9. รูปภาพบอกจุดอ่อน (เว้นว่างถ้าใช้รูปเดิม):</label><input type="file" id="editWeaknessChart" accept="image/*" /></div>
+            <button type="submit" class="game-button submit-btn" style="border-color: #1565c0; color: #1565c0">บันทึกการแก้ไข</button>
           </form>
         </div>
       </div>
@@ -229,11 +153,35 @@
       </div>
     </div>
 
-    <script type="module" src="index.js"></script>
     <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox()">
       <span class="lightbox-close">&times;</span>
       <img class="lightbox-content" id="lightboxImg">
     </div>
-    <button id="floating-add-btn" class="admin-only floating-add-btn" onclick="openAddModal()">+</button>
+
+    <div class="admin-tools-container admin-only">
+        <button class="tool-btn edit-tool" onclick="toggleMode('edit')" title="โหมดแก้ไข (คลิกที่มอนสเตอร์)">✏️</button>
+        <button class="tool-btn delete-tool" onclick="toggleMode('delete')" title="โหมดลบ (คลิกที่มอนสเตอร์)">🗑️</button>
+        <button class="tool-btn add-tool" onclick="openAddModal()" title="เพิ่มมอนสเตอร์">➕</button>
+    </div>
+
+    <div id="deleteActionBar" class="delete-action-bar">
+        <span id="deleteCountText">คลิกเลือกมอนสเตอร์ที่ต้องการลบ (0 ตัว)</span>
+        <button class="game-button confirm" onclick="openFullScreenDeleteConfirm()">ลบข้อมูลที่เลือก</button>
+        <button class="game-button cancel" onclick="toggleMode('normal')">ยกเลิก</button>
+    </div>
+
+    <div class="modal-overlay full-screen-delete" id="fullScreenDeleteModal">
+        <div class="full-screen-delete-content">
+            <h1 class="warning-title">⚠️ คำเตือน! ยืนยันการลบข้อมูล ⚠️</h1>
+            <p>คุณกำลังจะลบมอนสเตอร์ดังต่อไปนี้อย่างถาวร (ไม่สามารถกู้คืนได้):</p>
+            <div id="deleteNamesList" class="delete-names-list"></div>
+            <div class="full-screen-actions">
+                <button class="game-button danger" onclick="executeMassDelete()">ยืนยันการลบถาวร</button>
+                <button class="game-button" onclick="closeFullScreenDeleteConfirm()">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="index.js"></script>
   </body>
 </html>
