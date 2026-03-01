@@ -317,34 +317,46 @@ window.closeAddModal = function() { document.getElementById('addMonsterModal').c
 document.getElementById('addMonsterForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const submitBtn = this.querySelector('button[type="submit"]');
-    submitBtn.innerText = "กำลังอัปโหลดรูปภาพ..."; 
+    const originalText = submitBtn.innerText;
+    
+    submitBtn.innerText = "กำลังอัปโหลดรูปภาพและบันทึก..."; 
     submitBtn.disabled = true;
 
     try {
-        // 1. Upload images to ImgBB first
+        // 1. Upload images to ImgBB and get the URL strings
         const thumbnailURL = await uploadToImgBB(document.getElementById('newThumbnail'));
         const detailImageURL = await uploadToImgBB(document.getElementById('newDetailImage'));
         const weaknessChartURL = await uploadToImgBB(document.getElementById('newWeaknessChart'));
 
-        // 2. Save only the URLs to Firebase
-        await addDoc(collection(db, "monsters"), {
+        // 2. Prepare the data object using those URLs
+        const newMonsterData = {
             name: document.getElementById('newName').value,
+            species: document.getElementById('newSpecies').value,
+            habitats: document.getElementById('newHabitats').value,
+            ailments: document.getElementById('newAilments').value,
             description: document.getElementById('newDescription').value,
             weaknessText: document.getElementById('newWeaknessText').value,
-            thumbnail: thumbnailURL,       // Now a URL string, not a giant Base64
-            detailImage: detailImageURL,
-            weaknessChart: weaknessChartURL,
-            createdAt: Date.now()
-        });
+            thumbnail: thumbnailURL,       // Use the URL from ImgBB
+            detailImage: detailImageURL,   // Use the URL from ImgBB
+            weaknessChart: weaknessChartURL, // Use the URL from ImgBB
+            createdAt: Date.now() 
+        };
 
-        this.reset();
-        closeAddModal();
-        loadMonsters(); 
+        // 3. Save to Firebase
+        // Note: Make sure 'db' and 'collection' are imported/defined in your script
+        await addDoc(collection(db, "monsters"), newMonsterData);
+
+        // 4. Success UI updates
         alert("เพิ่มมอนสเตอร์สำเร็จ!");
+        this.reset(); // Clear the form
+        closeAddModal(); // Close the popup
+        loadMonsters(); // Refresh the list on the screen
+
     } catch (error) {
+        console.error("Error adding monster:", error);
         alert("เกิดข้อผิดพลาด: " + error.message);
     } finally {
-        submitBtn.innerText = "บันทึกข้อมูลมอนสเตอร์";
+        submitBtn.innerText = originalText;
         submitBtn.disabled = false;
     }
 });
