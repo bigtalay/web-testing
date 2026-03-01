@@ -8,7 +8,7 @@ const modal = document.getElementById('monsterModal');
 window.isAdminLoggedIn = false; 
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD3jwOwv5FHHi_IM3nVPQNQC6ayPnuylEA",
@@ -20,7 +20,11 @@ const firebaseConfig = {
   measurementId: "G-1DR3E38CKP"
 };
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+// Tell Firebase to use Long Polling to bypass firewalls
+const db = initializeFirestore(app, {
+    experimentalForceLongPolling: true
+});
 
 let monstersData = {};
 let allMonstersArray = []; 
@@ -310,6 +314,43 @@ window.openAddModal = function() {
 }
 window.closeAddModal = function() { document.getElementById('addMonsterModal').classList.remove('show'); }
 
+document.getElementById('addMonsterForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.innerText = "กำลังอัปโหลดรูปภาพ..."; 
+    submitBtn.disabled = true;
+
+    try {
+        // 1. Upload images to ImgBB first
+        const thumbnailURL = await uploadToImgBB(document.getElementById('newThumbnail'));
+        const detailImageURL = await uploadToImgBB(document.getElementById('newDetailImage'));
+        const weaknessChartURL = await uploadToImgBB(document.getElementById('newWeaknessChart'));
+
+        // 2. Save only the URLs to Firebase
+        await addDoc(collection(db, "monsters"), {
+            name: document.getElementById('newName').value,
+            description: document.getElementById('newDescription').value,
+            weaknessText: document.getElementById('newWeaknessText').value,
+            thumbnail: thumbnailURL,       // Now a URL string, not a giant Base64
+            detailImage: detailImageURL,
+            weaknessChart: weaknessChartURL,
+            createdAt: Date.now()
+        });
+
+        this.reset();
+        closeAddModal();
+        loadMonsters(); 
+        alert("เพิ่มมอนสเตอร์สำเร็จ!");
+    } catch (error) {
+        alert("เกิดข้อผิดพลาด: " + error.message);
+    } finally {
+        submitBtn.innerText = "บันทึกข้อมูลมอนสเตอร์";
+        submitBtn.disabled = false;
+    }
+});
+
+
+
 window.openEditModal = function(id) {
     const m = monstersData[id];
     if (m) {
@@ -329,140 +370,71 @@ document.getElementById('editMonsterModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('editMonsterModal')) closeEditModal();
 });
 
-function convertFileToBase64(fileInput) {
-    return new Promise((resolve, reject) => {
-        const file = fileInput.files[0];
-        if (!file) {
-            resolve(""); 
-            return;
-        }
+// Replace your old convertFileToBase64 with this
+async function uploadToImgBB(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return ""; // Return empty if no file selected
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
-                const MAX_SIZE = 800; 
-
-                if (width > height) {
-                    if (width > MAX_SIZE) {
-                        height *= MAX_SIZE / width;
-                        width = MAX_SIZE;
-                    }
-                } else {
-                    if (height > MAX_SIZE) {
-                        width *= MAX_SIZE / height;
-                        height = MAX_SIZE;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const webpBase64 = canvas.toDataURL("image/webp", 0.8);
-                resolve(webpBase64);
-            };
-            img.onerror = () => reject("ไฟล์รูปภาพมีปัญหา ไม่สามารถอ่านได้");
-            img.src = event.target.result;
-        };
-        
-        reader.onerror = error => reject("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ");
-    });
-}
-
-document.getElementById('addMonsterForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังบันทึก..."; btn.disabled = true;
+    const apiKey = "a29644d7e65dd033a1dd85cc6924c29e"; // Put your API key here
+    const formData = new FormData();
+    formData.append("image", file);
 
     try {
-        const thumbnailBase64 = await convertFileToBase64(document.getElementById('newThumbnail'));
-        const detailImageBase64 = await convertFileToBase64(document.getElementById('newDetailImage'));
-        const weaknessChartBase64 = await convertFileToBase64(document.getElementById('newWeaknessChart'));
-
-        const newMonsterData = {
-            category: document.getElementById('newCategory').value,
-            name: document.getElementById('newName').value,
-            species: document.getElementById('newSpecies').value,
-            habitats: document.getElementById('newHabitats').value,
-            ailments: document.getElementById('newAilments').value,
-            thumbnail: thumbnailBase64,
-            detailImage: detailImageBase64,
-            description: document.getElementById('newDescription').value,
-            weaknessText: document.getElementById('newWeaknessText').value,
-            weaknessChart: weaknessChartBase64,
-            createdAt: Date.now() 
-        };
-
-        await addDoc(collection(db, "monsters"), newMonsterData);
-        alert("✅ เพิ่มสำเร็จ!");
-        closeAddModal(); 
-        e.target.reset(); 
-        loadMonsters(); 
-    } catch (error) { 
-        console.error(error);
-        alert("❌ เกิดข้อผิดพลาด: " + (error.message || error)); 
-    } finally { 
-        btn.innerHTML = "บันทึกข้อมูลมอนสเตอร์"; 
-        btn.disabled = false; 
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+            method: "POST",
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            return data.data.url; // This is the direct link to the image
+        } else {
+            throw new Error("ImgBB Upload Failed: " + data.error.message);
+        }
+    } catch (error) {
+        console.error("Upload error:", error);
+        throw error;
     }
-});
+}
+
+
 
 document.getElementById('editMonsterForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.innerHTML = "⏳ กำลังอัปเดต..."; btn.disabled = true;
-    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
     const id = document.getElementById('editMonsterId').value;
-    const m = monstersData[id]; 
+    const oldData = monstersData[id]; // Get current data to keep old images if no new ones
     
+    submitBtn.innerText = "กำลังอัปเดต...";
+    submitBtn.disabled = true;
+
     try {
-        let finalThumbnail = m.thumbnail;
-        if(document.getElementById('editThumbnail').files.length > 0) {
-            finalThumbnail = await convertFileToBase64(document.getElementById('editThumbnail'));
-        }
+        // Only upload if a file is actually selected in the input
+        const thumbInput = document.getElementById('editThumbnail');
+        const detailInput = document.getElementById('editDetailImage');
+        const chartInput = document.getElementById('editWeaknessChart');
 
-        let finalDetailImage = m.detailImage;
-        if(document.getElementById('editDetailImage').files.length > 0) {
-            finalDetailImage = await convertFileToBase64(document.getElementById('editDetailImage'));
-        }
-
-        let finalWeaknessChart = m.weaknessChart || "";
-        if(document.getElementById('editWeaknessChart').files.length > 0) {
-            finalWeaknessChart = await convertFileToBase64(document.getElementById('editWeaknessChart'));
-        }
+        const thumbnailURL = thumbInput.files.length > 0 ? await uploadToImgBB(thumbInput) : oldData.thumbnail;
+        const detailImageURL = detailInput.files.length > 0 ? await uploadToImgBB(detailInput) : oldData.detailImage;
+        const weaknessChartURL = chartInput.files.length > 0 ? await uploadToImgBB(chartInput) : oldData.weaknessChart;
 
         const updatedData = {
-            category: document.getElementById('editCategory').value,
             name: document.getElementById('editName').value,
-            species: document.getElementById('editSpecies').value,
-            habitats: document.getElementById('editHabitats').value,
-            ailments: document.getElementById('editAilments').value,
-            thumbnail: finalThumbnail, 
-            detailImage: finalDetailImage,
             description: document.getElementById('editDescription').value,
             weaknessText: document.getElementById('editWeaknessText').value,
-            weaknessChart: finalWeaknessChart
+            thumbnail: thumbnailURL,
+            detailImage: detailImageURL,
+            weaknessChart: weaknessChartURL
         };
 
         await updateDoc(doc(db, "monsters", id), updatedData);
-        alert("✅ แก้ไขเรียบร้อย!");
-        closeEditModal(); 
-        closeModal(); 
-        loadMonsters(); 
-    } catch (error) { 
-        console.error(error);
-        alert("❌ เกิดข้อผิดพลาด: " + error.message); 
-    } finally { 
-        btn.innerHTML = "บันทึกการแก้ไข"; 
-        btn.disabled = false; 
+        alert("แก้ไขเรียบร้อย!");
+        closeEditModal(); closeModal(); loadMonsters();
+    } catch (error) {
+        alert("เกิดข้อผิดพลาด: " + error.message);
+    } finally {
+        submitBtn.innerText = "บันทึกการแก้ไข";
+        submitBtn.disabled = false;
     }
 });
 
