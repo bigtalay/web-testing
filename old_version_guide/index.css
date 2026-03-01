@@ -60,7 +60,7 @@ body, html {
 .sec1 .monster-grid { position: relative; z-index: 2; }
 .monster-list-title { color: white; z-index: 2; text-shadow: 0 2px 4px black; margin-bottom: 10px; }
 
-/* ➕ CSS สำหรับโลโก้ ซ้ายบน (ลอยติดจอ) */
+/* CSS สำหรับโลโก้ ซ้ายบน */
 .top-left-logo {
     position: fixed;
     top: 20px;
@@ -74,13 +74,17 @@ body, html {
     transform: scale(1.05);
 }
 
-/* CSS สำหรับช่องค้นหา */
+/* ========================================= */
+/* CSS สำหรับช่องค้นหา (แก้ไขให้ลอยสวยงาม) */
+/* ========================================= */
 .search-container {
     width: 90%;
     max-width: 600px;
     margin-bottom: 20px;
     z-index: 2;
     position: relative;
+    /* เพิ่ม transition ให้มันสไลด์ขึ้นลงได้เนียนๆ ตอนพิมพ์ค้นหา */
+    transition: top 1.0s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 #searchInput {
     width: 100%;
@@ -100,6 +104,26 @@ body, html {
     background: rgba(0, 0, 0, 0.9);
     box-shadow: 0 0 15px rgba(227, 193, 111, 0.5);
 }
+
+/* --- คลาสพิเศษ: โหมดกล่องค้นหาลอยติดจอ --- */
+.search-container.is-searching {
+    position: absolute !important;
+    left: 50%;
+    transform: translateX(-50%) !important; /* จัดให้อยู่ตรงกลางเสมอ */
+    z-index: 10000 !important; /* ลอยอยู่บนสุดเหนือทุกสิ่ง */
+    background: rgba(0, 0, 0, 0.85);
+    padding: 12px 20px;
+    border-radius: 35px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+    width: 90% !important;
+    max-width: 650px !important;
+}
+/* เปลี่ยนสีกรอบเป็นสีเขียวเพื่อให้รู้ว่ากำลังค้นหาอยู่ */
+.search-container.is-searching #searchInput {
+    border-color: #00ff96;
+    box-shadow: 0 0 15px rgba(0,255,150,0.5);
+}
+/* ========================================= */
 
 /* Grid การ์ดมอนสเตอร์ */
 .monster-grid {
@@ -161,7 +185,7 @@ body, html {
 h2 { margin-top: 0; color: #5f4b8b; }
 .weakness-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 2px solid #5f4b8b; }
 
-/* ปุ่มเสียง ล่างซ้าย (ลอยติดจอ) */
+/* ปุ่มเสียง ล่างซ้าย */
 .audio-container { position: fixed; bottom: 25px; left: 25px; z-index: 9999; }
 .game-button {
     background: linear-gradient(135deg, #4b4b4b 0%, #2b2b2b 100%); color: #e3c16f; border: 2px solid #e3c16f;
@@ -170,24 +194,11 @@ h2 { margin-top: 0; color: #5f4b8b; }
 }
 .game-button:hover { background: #e3c16f; color: #2b2b2b; box-shadow: 0 0 20px rgba(227, 193, 111, 0.8); }
 
-/* ปุ่ม Admin ขวาบน (ลอยติดจอ) */
+/* ปุ่ม Admin ขวาบน */
 .admin-top-right-btn {
-  position: fixed; 
-  top: 25px;
-  right: 25px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(30, 30, 30, 0.8); 
-  color: #ffffff;
-  border: 1px solid #444;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  z-index: 9999; 
-  transition: all 0.3s ease;
+  position: fixed; top: 25px; right: 25px; display: flex; align-items: center; gap: 8px;
+  background: rgba(30, 30, 30, 0.8); color: #ffffff; border: 1px solid #444; padding: 10px 16px;
+  border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; z-index: 9999; transition: all 0.3s ease;
 }
 .admin-top-right-btn:hover { background: #ffcc00; color: #000000; border-color: #ffcc00; transform: scale(1.05); }
 .logout-variant:hover { background: #e74c3c !important; border-color: #e74c3c !important; color: white !important; }
@@ -230,12 +241,10 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
 .monster-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 .input-group { display: flex; flex-direction: column; gap: 5px; }
 .input-group label { font-weight: bold; color: #3e2723; font-size: 1.1rem; }
-
-/* ➕ เพิ่ม select เข้าไปจัดสไตล์ให้ตรงกับกล่องอื่นๆ */
 .input-group input, .input-group textarea, .input-group select { padding: 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Segoe UI', sans-serif; font-size: 1rem; background: rgba(255,255,255,0.8); }
 .input-group input:focus, .input-group textarea:focus, .input-group select:focus { outline: none; border-color: #5f4b8b; }
-
 .submit-btn { margin-top: 20px; padding: 15px; font-size: 1.2rem; text-align: center; width: 100%; }
+
 .delete-section { position: absolute; bottom: -50px; left: 0px; z-index: 105; display: flex; gap: 15px; align-items: center; }
 .delete-btn, .edit-btn { background: none; border: none; cursor: pointer; padding: 5px; transition: transform 0.2s, color 0.2s; }
 .delete-btn { color: #3e2723; } .delete-btn:hover { transform: scale(1.1); color: #d32f2f; }
@@ -269,17 +278,16 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
 
 /* ---ระบบขยายรูป (Lightbox) --- */
 .lightbox-overlay {
-    display: none; /* ซ่อนไว้ก่อน */
+    display: none;
     position: fixed;
-    z-index: 10001; /* ให้อยู่เหนือทุกอย่าง */
+    z-index: 10001; 
     left: 0; top: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.9); /* พื้นหลังดำโปร่งแสง */
+    background-color: rgba(0,0,0,0.9); 
     justify-content: center;
     align-items: center;
     cursor: zoom-out;
 }
-
 .lightbox-content {
     max-width: 90%;
     max-height: 90%;
@@ -288,12 +296,10 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
     animation: zoomIn 0.3s ease;
 }
-
 @keyframes zoomIn {
     from {transform: scale(0.5); opacity: 0;}
     to {transform: scale(1); opacity: 1;}
 }
-
 .lightbox-close {
     position: absolute;
     top: 20px; right: 35px;
@@ -302,8 +308,6 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
     font-weight: bold;
     cursor: pointer;
 }
-
-/* ปรับให้รูปในสมุดมี Cursor เป็นรูปแว่นขยาย */
 .monster-image-large img, .weakness-img {
     cursor: zoom-in;
     transition: transform 0.2s;
@@ -316,7 +320,7 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
 .floating-add-btn {
     position: fixed;
     bottom: 30px;
-    right: 40px; /* วางไว้ขวาล่าง ไม่ให้ทับวงกลมจุดนำทาง */
+    right: 40px; 
     width: 65px;
     height: 65px;
     border-radius: 50%;
@@ -334,23 +338,6 @@ body:not(.admin-logged-in) .admin-only { display: none !important; }
     transition: transform 0.3s, box-shadow 0.3s;
 }
 .floating-add-btn:hover {
-    transform: scale(1.15) rotate(90deg); /* ตอนชี้ให้หมุนนิดๆ เท่ๆ */
+    transform: scale(1.15) rotate(90deg); 
     box-shadow: 0 6px 20px rgba(39, 174, 96, 0.7);
-}
-
-/* --- โหมดช่องค้นหาลอยตามจอ (ทำงานเฉพาะตอนพิมพ์ค้นหา) --- */
-.search-container.is-searching {
-    position: fixed;
-    top: 100px; /* ลอยอยู่ด้านบนเหนือ Grid */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10000;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-    border-radius: 25px;
-    animation: popDown 0.3s ease forwards;
-}
-
-@keyframes popDown {
-    from { top: 0px; opacity: 0; }
-    to { top: 100px; opacity: 1; }
 }

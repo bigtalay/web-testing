@@ -25,7 +25,6 @@ const db = getFirestore(app);
 let monstersData = {};
 let allMonstersArray = []; 
 
-// ✅ เพิ่มระบบ Try-Catch ดักจับ Error จาก Firebase
 async function loadMonsters() {
     try {
         const snapshot = await getDocs(collection(db, "monsters"));
@@ -54,7 +53,6 @@ async function loadMonsters() {
         console.error("Firebase Error: ", error);
         alert("❌ เกิดข้อผิดพลาดในการดึงข้อมูลจาก Firebase:\n" + error.message);
     } finally {
-        // ไม่ว่าจะดึงข้อมูลสำเร็จ หรือ ฐานข้อมูลพัง ก็ต้องปิดหน้า Loading
         const loadingScreen = document.getElementById('loadingScreen');
         if (loadingScreen) loadingScreen.style.display = 'none';
     }
@@ -190,50 +188,64 @@ function renderCategory(items, baseSectionId, titleText, category) {
     });
 }
 
-// ✅ ระบบค้นหาและเลื่อนหน้าจออัตโนมัติ (พร้อมช่องค้นหาลอยตามจอ)
+// ==========================================
+// ✅ ฟังก์ชันค้นหาแบบใหม่: ดันกล่องไปอยู่ชิดขอบบนจอเสมอ
+// ==========================================
 window.handleSearch = function(searchTerm) {
-    const term = searchTerm.toLowerCase().trim();
-    let filtered = [];
-    
-    // ดึงกล่องค้นหามาเพื่อสั่งให้มันลอย
-    const searchContainer = document.querySelector('.search-container');
-
-    if (term === "") {
-        filtered = allMonstersArray;
-        // ถ้าช่องค้นหาว่างเปล่า ให้เอาคลาสลอยออก (กลับไปแปะที่ภาค World เหมือนเดิม)
-        if (searchContainer) searchContainer.classList.remove('is-searching');
-    } else {
-        filtered = allMonstersArray.filter(item => 
-            item.data.name.toLowerCase().includes(term)
-        );
-        // ถ้ากำลังพิมพ์ค้นหาอยู่ ให้เติมคลาสเพื่อให้กล่องค้นหาลอยตามจอ
-        if (searchContainer) searchContainer.classList.add('is-searching');
-    }
-    
-    renderMonsterGrid(filtered);
-
-    // ระบบสไลด์หน้าจอ
-    if (term === "") {
-        scrollToSection(1);
-    } else {
-        const hasWorld = filtered.some(m => m.data.category !== 'iceborne');
-        const hasIceborne = filtered.some(m => m.data.category === 'iceborne');
-
-        if (!hasWorld && hasIceborne) {
-            const sectionsArray = Array.from(document.querySelectorAll('.section, .dynamic-page'));
-            const iceborneIndex = sectionsArray.findIndex(sec => sec.id === 'sec-iceborne' || sec.classList.contains('dynamic-page-iceborne'));
-            if (iceborneIndex !== -1) {
-                scrollToSection(iceborneIndex);
+    try {
+        const term = searchTerm.toLowerCase().trim();
+        let filtered = [];
+        
+        const searchContainer = document.querySelector('.search-container');
+        let targetIndex = 1; // เริ่มต้นที่หน้า World
+        
+        if (term === "") {
+            filtered = allMonstersArray;
+            // ถ้าลบคำค้นหาทิ้ง ให้กล่องกลับไปอยู่จุดเดิม
+            if (searchContainer) {
+                searchContainer.classList.remove('is-searching');
+                searchContainer.style.top = '';
+                searchContainer.style.transform = '';
             }
-        } else if (hasWorld) {
-            const sectionsArray = Array.from(document.querySelectorAll('.section, .dynamic-page'));
-            const worldIndex = sectionsArray.findIndex(sec => sec.id === 'sec-world' || sec.classList.contains('dynamic-page-world'));
-            if (worldIndex !== -1) {
-                scrollToSection(worldIndex);
-            }
+        } else {
+            filtered = allMonstersArray.filter(item => {
+                const mName = item.data.name || "";
+                return mName.toLowerCase().includes(term);
+            });
         }
+        
+        renderMonsterGrid(filtered);
+
+        if (term !== "") {
+            const hasWorld = filtered.some(m => m.data.category !== 'iceborne');
+            const hasIceborne = filtered.some(m => m.data.category === 'iceborne');
+            const sectionsArray = Array.from(document.querySelectorAll('.section, .dynamic-page'));
+            
+            if (!hasWorld && hasIceborne) {
+                targetIndex = sectionsArray.findIndex(sec => sec.id === 'sec-iceborne' || sec.classList.contains('dynamic-page-iceborne'));
+                if (targetIndex === -1) targetIndex = 2; 
+            } else if (hasWorld) {
+                targetIndex = sectionsArray.findIndex(sec => sec.id === 'sec-world' || sec.classList.contains('dynamic-page-world'));
+                if (targetIndex === -1) targetIndex = 1; 
+            }
+
+            if (searchContainer) {
+                searchContainer.classList.add('is-searching');
+                // คำนวณความสูงให้กล่องไปลอยอยู่ "ห่างจากขอบบน 40px" ของหน้าที่สไลด์ไป
+                const offsetVH = (targetIndex - 1) * 100;
+                searchContainer.style.top = `calc(${offsetVH}vh + 40px)`;
+            }
+        } else {
+            targetIndex = 1;
+        }
+
+        scrollToSection(targetIndex);
+
+    } catch (err) {
+        console.error("Search Error:", err);
     }
 }
+// ==========================================
 
 function scrollToSection(index) {
     if (index < 0 || index >= totalSections) return;
@@ -258,6 +270,10 @@ window.addEventListener('wheel', (e) => {
 
 window.addEventListener('keydown', (e) => {
     if (modal.classList.contains('show') || document.getElementById('addMonsterModal').classList.contains('show') || document.getElementById('editMonsterModal').classList.contains('show')) return;
+    
+    // ป้องกันหน้าจอสไลด์เวลาที่เรากดลูกศรเลื่อนซ้ายขวาในช่องค้นหา
+    if (document.activeElement === document.getElementById('searchInput')) return;
+
     if (isScrolling) return;
     if (e.key === 'ArrowDown') scrollToSection(currentSection + 1);
     if (e.key === 'ArrowUp') scrollToSection(currentSection - 1);
